@@ -6,10 +6,10 @@ import "./Card.css"
 
 const Card = ({ suit, rank }) => (
   <div className="card">
-    <div className="card-corner">
+    {/* <div className="card-corner">
       <div className="card-rank">{rank}</div>
       <div className={`card-suit ${suit}`}></div>
-    </div>
+    </div> */}
     <div className="card-center">
       <div className="card-rank">{rank}</div>
       <div className={`card-suit ${suit}`}></div>

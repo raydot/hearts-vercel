@@ -3,6 +3,9 @@ import { SocketContext } from "@/context/SocketProvider"
 import Card from "../Card/Card"
 import { handSorter } from "../../cardOps/handSorter"
 import "./PlayerHand.css"
+import "@/components/Card/Card.css"
+
+// console.log("SC:", SocketContext)
 
 const PlayerHand = () => {
   const { playerHands } = useContext(SocketContext)
@@ -11,7 +14,7 @@ const PlayerHand = () => {
   const sortedPlayerHand = [...playerHand].sort(handSorter)
 
   return (
-    <div className="playerHand">
+    <div className="card-container">
       {sortedPlayerHand.map((card, index) => (
         <Card key={index} suit={card.suit} rank={card.rank} />
       ))}
