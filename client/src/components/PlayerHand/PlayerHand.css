@@ -1,0 +1,28 @@
+/* src/components/PlayerHand/PlayerHand.css */
+.card-container {
+  display: flex;
+  flex-wrap: nowrap; /* Ensure cards do not wrap */
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%; /* Span the width of the screen */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 1vw;
+  box-sizing: border-box;
+  overflow: hidden; /* Hide overflow if cards exceed container width */
+  background-color: transparent; /* Ensure no background behind the cards */
+}
+
+.card {
+  flex: 0 0 auto; /* Ensure cards do not stretch */
+  width: 6vw;
+  height: auto; /* Maintain aspect ratio */
+  border: 0.1vw solid #000;
+  border-radius: 1vw;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5vw; /* Add some spacing between cards */
+}

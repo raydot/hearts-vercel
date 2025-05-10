@@ -1,0 +1,69 @@
+/* src/components/Card.css */
+
+.card {
+  flex: 1 1 calc(100% / 13); /* Ensure each card takes up 1/13th of the container */
+  max-width: calc(
+    100% / 13
+  ); /* Ensure each card does not exceed 1/13th of the container */
+  height: auto; /* Maintain aspect ratio */
+  border: 0.1vw solid #000;
+  border-radius: 1vw;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5vw; /* Add some spacing between cards */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.card:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card-corner {
+  position: absolute;
+  top: 1vh;
+  left: 1vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-rank {
+  font-size: 2vw;
+  font-weight: bold;
+}
+
+.card-suit {
+  font-size: 2vw;
+}
+
+.card-suit.hearts::before {
+  content: "♥";
+  color: red;
+}
+
+.card-suit.diamonds::before {
+  content: "♦";
+  color: red;
+}
+
+.card-suit.clubs::before {
+  content: "♣";
+  color: black;
+}
+
+.card-suit.spades::before {
+  content: "♠";
+  color: black;
+}
