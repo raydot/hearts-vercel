@@ -10,8 +10,11 @@ interface PlayerProps {
 const Player: React.FC<PlayerProps> = ({ name, isComputer, position }) => {
   return (
     <div className={`player-info ${position}`}>
-      <div className="player-name">{name}</div>
-      {isComputer && <div className="player-type">(Computer)</div>}
+      <div className="player-marker" />
+      <div className="player-name-block">
+        <div className="player-name">{name}</div>
+        {isComputer && <div className="player-type">(Computer)</div>}
+      </div>
     </div>
   )
 }

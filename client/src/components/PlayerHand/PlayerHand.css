@@ -1,28 +1,52 @@
 /* src/components/PlayerHand/PlayerHand.css */
+
 .card-container {
   display: flex;
-  flex-wrap: nowrap; /* Ensure cards do not wrap */
-  justify-content: space-evenly;
-  align-items: center;
-  width: 100%; /* Span the width of the screen */
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding: 1vw;
-  box-sizing: border-box;
-  overflow: hidden; /* Hide overflow if cards exceed container width */
-  background-color: transparent; /* Ensure no background behind the cards */
+  justify-content: center;
+  padding: 20px;
+  min-height: 160px;
+  position: relative;
 }
 
-.card {
-  flex: 0 0 auto; /* Ensure cards do not stretch */
-  width: 6vw;
-  height: auto; /* Maintain aspect ratio */
-  border: 0.1vw solid #000;
-  border-radius: 1vw;
-  background-color: #fff;
+.fanned-cards {
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: 0.5vw; /* Add some spacing between cards */
+  align-items: flex-end;
+  height: 180px;
+  perspective: 1000px;
+}
+
+.card-wrapper {
+  transition: transform 0.3s ease-in-out;
+  position: relative;
+}
+
+.card-wrapper.playable .card {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  border-color: #00cc00;
+}
+
+.card-wrapper.not-playable .card {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.card-wrapper:hover {
+  transform: translateY(-15px) scale(1.05) !important;
+  z-index: 100 !important;
+}
+
+.card-wrapper.not-playable:hover {
+  transform: translateY(-5px) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-wrapper {
+    margin-left: -20px !important;
+  }
+  
+  .card-wrapper:first-child {
+    margin-left: 0 !important;
+  }
 }

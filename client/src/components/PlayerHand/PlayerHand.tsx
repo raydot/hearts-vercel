@@ -7,9 +7,14 @@ import "./PlayerHand.css"
 interface PlayerHandProps {
   playerHand: CardType[]
   onCardClick: (card: CardType) => void
+  isCardPlayable?: (card: CardType) => boolean
 }
 
-const PlayerHand: React.FC<PlayerHandProps> = ({ playerHand, onCardClick }) => {
+const PlayerHand: React.FC<PlayerHandProps> = ({ 
+  playerHand, 
+  onCardClick, 
+  isCardPlayable = () => true // Default all cards are playable if not specified
+}) => {
   // Sort the hand by suit and rank
   const sortedPlayerHand = [...playerHand].sort((a, b) => {
     const suitOrder: Record<string, number> = {
@@ -32,15 +37,28 @@ const PlayerHand: React.FC<PlayerHandProps> = ({ playerHand, onCardClick }) => {
   });
 
   return (
-    <div className="card-container">
-      {sortedPlayerHand.map((card, index) => (
-        <Card
-          key={index}
-          suit={card.suit}
-          rank={card.rank}
-          onClick={() => onCardClick(card)}
-        />
-      ))}
+    <div className="card-container fanned-cards" data-testid="card-container">
+      {sortedPlayerHand.map((card, index) => {
+        const playable = isCardPlayable(card);
+        return (
+          <div 
+            key={index} 
+            className={`card-wrapper ${playable ? 'playable' : 'not-playable'}`}
+            style={{ 
+              marginLeft: index > 0 ? '-30px' : '0', 
+              zIndex: index + 1,
+              transform: `rotate(${-10 + (index * (20 / Math.max(sortedPlayerHand.length - 1, 1)))}deg)`,
+              transformOrigin: 'bottom center'
+            }}
+          >
+            <Card
+              suit={card.suit}
+              rank={card.rank}
+              onClick={() => playable ? onCardClick(card) : null}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 };

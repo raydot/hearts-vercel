@@ -1,13 +1,33 @@
 /* src/components/PlayingField.css */
 .playingField {
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
-  /* background-color: #228b22; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #1a1a1a;
+  overflow: hidden;
+  min-height: 600px;
+  min-width: 800px;
+}
+
+.felt-table {
+  position: relative;
+  width: 95%;
+  height: 95%;
+  min-height: 550px;
+  min-width: 700px;
+  border-radius: 50px;
+  background-color: #076324; /* Green felt color */
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  overflow: hidden;
+  border: 15px solid #5c3317; /* Wood border */
+  margin: 20px;
 }
 
 .player {
@@ -15,42 +35,90 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 10;
 }
 
-.top {
-  top: 10px;
+.player.top {
+  top: 30px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-.bottom {
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.left {
+.player.left {
+  left: 30px;
   top: 50%;
-  left: 10px;
   transform: translateY(-50%);
 }
 
-.right {
+.player.right {
+  right: 30px;
   top: 50%;
-  right: 10px;
   transform: translateY(-50%);
 }
 
 .human-player {
   position: absolute;
-  bottom: 0;
+  bottom: 30px;
   left: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 10;
+}
+
+.computer-hand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+.card-count {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .active {
-  border: 2px solid yellow;
+  box-shadow: 0 0 20px rgba(255, 255, 0, 0.7);
+  border-radius: 10px;
+  padding: 5px;
+  background-color: rgba(255, 255, 0, 0.2);
+}
+
+.center-play-area {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.trick-card-wrapper {
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .felt-table {
+    width: 95%;
+    height: 95%;
+    border-width: 8px;
+  }
+  
+  .center-play-area {
+    width: 150px;
+    height: 150px;
+  }
 }

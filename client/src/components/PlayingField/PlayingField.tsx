@@ -1,53 +1,71 @@
 import React from "react"
 import PlayerHand from "@/components/PlayerHand/PlayerHand"
 import Player from "@/components/Player/Player"
-import { Card } from "@/types"
+import Card from "@/components/Card/Card"
+import { Card as CardType } from "@/types"
 
 import "./PlayingField.css"
 
 interface PlayingFieldProps {
-  playerHands: Card[][]
+  playerHands: CardType[][]
   currentTurn: number
-  onCardClick: (card: Card) => void
+  onCardClick: (card: CardType) => void
+  trickCards?: CardType[]
+  isCardPlayable?: (card: CardType) => boolean
 }
 
 const PlayingField: React.FC<PlayingFieldProps> = ({
   playerHands,
   currentTurn,
-  onCardClick
+  onCardClick,
+  trickCards,
+  isCardPlayable
 }) => {
   // Make sure the player has a hand
   const playerHand = playerHands[0] || []
 
   return (
-    <div className="playingField">
-      <div className={`player top ${currentTurn === 1 ? "active" : ""}`}>
-        <Player name="Computer 1" isComputer={true} position="top" />
-        {playerHands[1] && (
-          <div className="computer-hand">
-            <div className="card-count">{playerHands[1].length} cards</div>
-          </div>
-        )}
-      </div>
-      <div className={`player left ${currentTurn === 2 ? "active" : ""}`}>
-        <Player name="Computer 2" isComputer={true} position="left" />
-        {playerHands[2] && (
-          <div className="computer-hand">
-            <div className="card-count">{playerHands[2].length} cards</div>
-          </div>
-        )}
-      </div>
-      <div className={`player right ${currentTurn === 3 ? "active" : ""}`}>
-        <Player name="Computer 3" isComputer={true} position="right" />
-        {playerHands[3] && (
-          <div className="computer-hand">
-            <div className="card-count">{playerHands[3].length} cards</div>
-          </div>
-        )}
-      </div>
-      <div className={`human-player ${currentTurn === 0 ? "active" : ""}`}>
-        <Player name="You" isComputer={false} position="bottom" />
-        <PlayerHand playerHand={playerHand} onCardClick={onCardClick} />
+    <div className="playingField green-felt" data-testid="playing-field" style={{ width: '100%', minWidth: '800px' }}>
+      <div className="felt-table">
+        <div className={`player top ${currentTurn === 1 ? "active" : ""}`} data-testid="player-top">
+          <Player name="Computer 1" isComputer={true} position="top" />
+        </div>
+        <div className={`player left ${currentTurn === 2 ? "active" : ""}`} data-testid="player-left">
+          <Player name="Computer 2" isComputer={true} position="left" />
+        </div>
+        <div className={`player right ${currentTurn === 3 ? "active" : ""}`} data-testid="player-right">
+          <Player name="Computer 3" isComputer={true} position="right" />
+        </div>
+        
+        {/* Center play area for trick cards */}
+        <div className="center-play-area" data-testid="center-play-area">
+          {trickCards && trickCards.map((card, index) => (
+            <div 
+              key={index} 
+              className="trick-card-wrapper"
+              data-testid="trick-card"
+              style={{ 
+                position: 'absolute',
+                transform: `rotate(${index * 15}deg)`,
+                zIndex: index
+              }}
+            >
+              <Card 
+                suit={card.suit} 
+                rank={card.rank} 
+              />
+            </div>
+          ))}
+        </div>
+        
+        <div className={`human-player ${currentTurn === 0 ? "active" : ""}`} data-testid="player-bottom">
+          <Player name="You" isComputer={false} position="bottom" />
+          <PlayerHand 
+            playerHand={playerHand} 
+            onCardClick={onCardClick} 
+            isCardPlayable={isCardPlayable}
+          />
+        </div>
       </div>
     </div>
   )

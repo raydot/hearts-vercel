@@ -3,8 +3,10 @@
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 800px;
 }
 
 .game-header {
@@ -84,4 +86,12 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure PlayingField takes up proper space */
+.game .playingField {
+  width: 100%;
+  min-width: 800px;
+  min-height: 600px;
+  margin-top: 20px;
 }
