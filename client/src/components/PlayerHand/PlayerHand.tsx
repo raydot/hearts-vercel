@@ -49,7 +49,6 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
           <div
             key={`${card.suit}-${card.rank}`}
             className={`card-wrapper ${isCardPlayable && isCardPlayable(card) ? 'playable' : 'not-playable'}`}
-            onClick={() => handleCardClick(card)}
             data-testid="card-wrapper"
             style={{ 
               marginLeft: index > 0 ? '-30px' : '0', 
@@ -61,7 +60,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
             <Card
               suit={card.suit}
               rank={card.rank}
-              onClick={() => isCardPlayable(card) ? onCardClick(card) : null}
+              onClick={() => handleCardClick(card)}
             />
           </div>
         );

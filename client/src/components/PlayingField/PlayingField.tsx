@@ -42,25 +42,53 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
         {/* Center play area for trick cards */}
         <div className="center-play-area" data-testid="center-play-area">
           {trickCards && trickCards.length > 0 ? (
-            // Only show up to 4 cards (a complete trick)
             // Add a visual indicator if we're in the clearing phase
             <div className={isClearingTrick ? 'trick-clearing' : ''}>
-              {trickCards.slice(0, 4).map((card, index) => (
-                <div 
-                  key={`trick-${card.suit}-${card.rank}-${index}`} 
-                  className="trick-card-wrapper" 
-                  data-testid="trick-card"
-                  style={{
-                    position: 'absolute',
-                    transform: `translate(${(index % 2) * 40 - 20}px, ${Math.floor(index / 2) * 40 - 20}px)`
-                  }}
-                >
-                  <Card 
-                    suit={card.suit} 
-                    rank={card.rank} 
-                  />
-                </div>
-              ))}
+              {trickCards.slice(0, 4).map((card, index) => {
+                // Position cards based on which player played them
+                // Calculate positions for each player's card
+                let positionStyle = {};
+                
+                // Determine the player position based on the lead player and card index
+                // Player positions: 0 = South (human), 1 = North, 2 = West, 3 = East
+                const playerPositions = ['bottom', 'top', 'left', 'right'];
+                const position = playerPositions[index];
+                
+                // Set position based on which player played the card
+                switch(position) {
+                  case 'bottom': // South (human)
+                    positionStyle = { bottom: '-30px', left: '50%', transform: 'translateX(-50%)' };
+                    break;
+                  case 'top': // North
+                    positionStyle = { top: '-30px', left: '50%', transform: 'translateX(-50%)' };
+                    break;
+                  case 'left': // West
+                    positionStyle = { left: '-30px', top: '50%', transform: 'translateY(-50%)' };
+                    break;
+                  case 'right': // East
+                    positionStyle = { right: '-30px', top: '50%', transform: 'translateY(-50%)' };
+                    break;
+                  default:
+                    positionStyle = { position: 'relative' };
+                }
+                
+                return (
+                  <div 
+                    key={`trick-${card.suit}-${card.rank}-${index}`} 
+                    className={`trick-card-wrapper trick-card-${position}`}
+                    data-testid="trick-card"
+                    style={{
+                      position: 'absolute',
+                      ...positionStyle
+                    }}
+                  >
+                    <Card 
+                      suit={card.suit} 
+                      rank={card.rank} 
+                    />
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="empty-trick-area">Play a card</div>

@@ -42,6 +42,8 @@ describe('Hearts Game Logic', () => {
             ]
             // Empty trickCards means this is the first card of a trick
             const trickCards = []
+            // Add some tricks to indicate it's not the first trick of the game
+            const tricks = [[{ suit: 'clubs', rank: '2' }], [], [], []]
             // We'll pass false for heartsBroken
             
             // Should be invalid to lead with hearts if hearts not broken

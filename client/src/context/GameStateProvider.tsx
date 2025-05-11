@@ -106,7 +106,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
         } else {
             // Move to next player clockwise
             // Player positions: 0 = South (human), 1 = North, 2 = West, 3 = East
-            // Clockwise order: 0 → 2 → 1 → 3 → 0
+            // Clockwise order (north, east, south, west): 1 → 3 → 0 → 2 → 1
             let nextPlayer;
             switch(playerIndex) {
                 case 0: nextPlayer = 2; break; // South → West

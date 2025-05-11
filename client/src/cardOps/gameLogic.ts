@@ -36,26 +36,32 @@ export const isValidMove = (
   heartsBroken: boolean = false,
   tricks: Card[][][] = [[], [], [], []]
 ): boolean => {
-  // Logic to check if move is valid
-
-  // Placeholder test
-  // console.log("Checking if move is valid:", card, playerIndex, playerHands)
-  // return true
-
-  // const playerHand = playerHands[playerIndex]
-
+  // Debug logging
+  console.log('isValidMove called with:', {
+    card,
+    playerIndex,
+    trickCards,
+    heartsBroken,
+    isFirstTrick: isFirstTrick(playerHands, tricks)
+  });
+  // Get the player's hand
+  const playerHand = playerHands[playerIndex];
+  
   // If this is the first card played in the trick
   if (trickCards.length === 0) {
     // First trick must lead with 2 of clubs
     if (isFirstTrick(playerHands, tricks)) {
       return card.suit === 'clubs' && card.rank === '2';
     }
+    
     // Can't lead with hearts until hearts are broken
     if (card.suit === 'hearts' && !heartsBroken) {
       // Exception: if player only has hearts
-      const onlyHasHearts = playerHands[playerIndex].every(card => card.suit === 'hearts');
+      const onlyHasHearts = playerHand.every(c => c.suit === 'hearts');
       return onlyHasHearts;
     }
+    
+    // All other leads are valid
     return true;
   }
   // must follow suit if possible
