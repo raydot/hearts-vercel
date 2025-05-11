@@ -47,13 +47,13 @@ describe('Hearts Game Logic', () => {
             // We'll pass false for heartsBroken
             
             // Should be invalid to lead with hearts if hearts not broken
-            expect(isValidMove({ suit: 'hearts', rank: '10' }, 0, playerHands, trickCards, false)).toBe(false)
+            expect(isValidMove({ suit: 'hearts', rank: '10' }, 0, playerHands, trickCards, false, tricks)).toBe(false)
             
             // Should be valid to lead with non-hearts
-            expect(isValidMove({ suit: 'diamonds', rank: '5' }, 0, playerHands, trickCards, false)).toBe(true)
+            expect(isValidMove({ suit: 'diamonds', rank: '5' }, 0, playerHands, trickCards, false, tricks)).toBe(true)
             
             // Should be valid to lead with hearts if hearts are broken
-            expect(isValidMove({ suit: 'hearts', rank: '10' }, 0, playerHands, trickCards, true)).toBe(true)
+            expect(isValidMove({ suit: 'hearts', rank: '10' }, 0, playerHands, trickCards, true, tricks)).toBe(true)
           })
     })
 
