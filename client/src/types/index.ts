@@ -27,8 +27,10 @@ export interface GameStateContextType {
     tricks: Card[][][]
     scores: number[]
     heartsBroken: boolean
+    isClearingTrick: boolean
     dealCards: () => void
     playCard: (card: Card, playerIndex: number) => void
     handleComputerTurn: () => void
+    isCardPlayable: (card: Card) => boolean
 }
     

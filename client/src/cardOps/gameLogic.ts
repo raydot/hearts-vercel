@@ -2,9 +2,10 @@ import { Card } from "@/types";
 
 // HELPER FUNCTIONS
 
-// TODO: refactor this helper
-const isFirstTrick = (playerHands: Card[][]): boolean => {
-  return playerHands.some(hand => hand.length === 13);
+// Determine if this is the first trick of the game
+const isFirstTrick = (_playerHands: Card[][], tricks: Card[][][]): boolean => {
+  // If any player has played a trick, it's not the first trick
+  return tricks.every(playerTricks => playerTricks.length === 0);
 };
 
 // Get numeric value of card rank
@@ -32,7 +33,8 @@ export const isValidMove = (
   playerIndex: number, 
   playerHands: Card[][], 
   trickCards: Card[] = [], 
-  heartsBroken: boolean = false
+  heartsBroken: boolean = false,
+  tricks: Card[][][] = [[], [], [], []]
 ): boolean => {
   // Logic to check if move is valid
 
@@ -45,7 +47,7 @@ export const isValidMove = (
   // If this is the first card played in the trick
   if (trickCards.length === 0) {
     // First trick must lead with 2 of clubs
-    if (isFirstTrick(playerHands)) {
+    if (isFirstTrick(playerHands, tricks)) {
       return card.suit === 'clubs' && card.rank === '2';
     }
     // Can't lead with hearts until hearts are broken

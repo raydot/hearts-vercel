@@ -126,6 +126,8 @@ export function playCard(
   if (newTrickCards.length === 4) {
     trickComplete = true;
     winnerIndex = determineTrickWinner(newTrickCards, leadPlayer);
+    console.log('Trick complete! Winner:', winnerIndex, 'Cards:', newTrickCards);
+    console.log('Trick length check:', newTrickCards.length);
     
     // Add trick to winner's tricks
     newTricks = [...tricks];
@@ -133,6 +135,9 @@ export function playCard(
     
     // Calculate scores
     scores = calculateScore(newTricks);
+  } else {
+    console.log('Card played:', card, 'by player', playerIndex, 'Current trick:', newTrickCards);
+    console.log('Trick length check:', newTrickCards.length);
   }
   
   return {
@@ -154,9 +159,10 @@ export function validateMove(
   playerIndex: number,
   playerHands: Card[][],
   trickCards: Card[] = [],
-  heartsBroken: boolean = false
+  heartsBroken: boolean = false,
+  tricks: Card[][][] = [[], [], [], []]
 ): boolean {
-  return isValidMove(card, playerIndex, playerHands, trickCards, heartsBroken);
+  return isValidMove(card, playerIndex, playerHands, trickCards, heartsBroken, tricks);
 }
 
 /**

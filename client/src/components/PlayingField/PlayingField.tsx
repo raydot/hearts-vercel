@@ -12,6 +12,7 @@ interface PlayingFieldProps {
   onCardClick: (card: CardType) => void
   trickCards?: CardType[]
   isCardPlayable?: (card: CardType) => boolean
+  isClearingTrick?: boolean
 }
 
 const PlayingField: React.FC<PlayingFieldProps> = ({
@@ -19,7 +20,8 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
   currentTurn,
   onCardClick,
   trickCards,
-  isCardPlayable
+  isCardPlayable,
+  isClearingTrick
 }) => {
   // Make sure the player has a hand
   const playerHand = playerHands[0] || []
@@ -39,23 +41,30 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
         
         {/* Center play area for trick cards */}
         <div className="center-play-area" data-testid="center-play-area">
-          {trickCards && trickCards.map((card, index) => (
-            <div 
-              key={index} 
-              className="trick-card-wrapper"
-              data-testid="trick-card"
-              style={{ 
-                position: 'absolute',
-                transform: `rotate(${index * 15}deg)`,
-                zIndex: index
-              }}
-            >
-              <Card 
-                suit={card.suit} 
-                rank={card.rank} 
-              />
+          {trickCards && trickCards.length > 0 ? (
+            // Only show up to 4 cards (a complete trick)
+            // Add a visual indicator if we're in the clearing phase
+            <div className={isClearingTrick ? 'trick-clearing' : ''}>
+              {trickCards.slice(0, 4).map((card, index) => (
+                <div 
+                  key={`trick-${card.suit}-${card.rank}-${index}`} 
+                  className="trick-card-wrapper" 
+                  data-testid="trick-card"
+                  style={{
+                    position: 'absolute',
+                    transform: `translate(${(index % 2) * 40 - 20}px, ${Math.floor(index / 2) * 40 - 20}px)`
+                  }}
+                >
+                  <Card 
+                    suit={card.suit} 
+                    rank={card.rank} 
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <div className="empty-trick-area">Play a card</div>
+          )}
         </div>
         
         <div className={`human-player ${currentTurn === 0 ? "active" : ""}`} data-testid="player-bottom">

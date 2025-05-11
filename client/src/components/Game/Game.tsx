@@ -19,9 +19,11 @@ const Game = () => {
     tricks,
     scores,
     heartsBroken,
+    isClearingTrick,
     dealCards,
     playCard,
-    handleComputerTurn
+    handleComputerTurn,
+    isCardPlayable
   } = gameState;
 
   // Handle computer turns
@@ -32,8 +34,17 @@ const Game = () => {
   }, [currentTurn, gameOver, handleComputerTurn]);
 
   const handleCardClick = (card: CardType) => {
+    console.log('Card clicked:', card);
     if (currentTurn === 0 && !gameOver) {
-      playCard(card, 0);
+      // Check if the move is valid
+      if (isCardPlayable(card)) {
+        console.log('Playing card:', card);
+        playCard(card, 0);
+      } else {
+        console.log('Invalid move!');
+      }
+    } else {
+      console.log('Not your turn or game is over');
     }
   };
 
@@ -105,6 +116,9 @@ const Game = () => {
           playerHands={playerHands}
           currentTurn={currentTurn}
           onCardClick={handleCardClick}
+          trickCards={trickCards}
+          isCardPlayable={isCardPlayable}
+          isClearingTrick={isClearingTrick}
         />
       )}
     </div>

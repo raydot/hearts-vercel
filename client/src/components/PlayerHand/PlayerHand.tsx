@@ -36,14 +36,21 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
     return rankOrder[a.rank] - rankOrder[b.rank];
   });
 
+  const handleCardClick = (card: CardType) => {
+    if (isCardPlayable && isCardPlayable(card)) {
+      onCardClick(card);
+    }
+  };
+
   return (
     <div className="card-container fanned-cards" data-testid="card-container">
       {sortedPlayerHand.map((card, index) => {
-        const playable = isCardPlayable(card);
         return (
-          <div 
-            key={index} 
-            className={`card-wrapper ${playable ? 'playable' : 'not-playable'}`}
+          <div
+            key={`${card.suit}-${card.rank}`}
+            className={`card-wrapper ${isCardPlayable && isCardPlayable(card) ? 'playable' : 'not-playable'}`}
+            onClick={() => handleCardClick(card)}
+            data-testid="card-wrapper"
             style={{ 
               marginLeft: index > 0 ? '-30px' : '0', 
               zIndex: index + 1,
@@ -54,7 +61,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
             <Card
               suit={card.suit}
               rank={card.rank}
-              onClick={() => playable ? onCardClick(card) : null}
+              onClick={() => isCardPlayable(card) ? onCardClick(card) : null}
             />
           </div>
         );
