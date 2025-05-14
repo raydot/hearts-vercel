@@ -149,13 +149,85 @@
 
 .trick-clearing {
   animation: pulse 1s ease-in-out;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 @keyframes pulse {
   0% { opacity: 1; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+/* Keyframes for clearing trick cards to player positions */
+@keyframes clear-to-player0 { /* To Bottom (Player 0) */
+  0% {
+    opacity: 1;
+    transform: var(--card-initial-transform, translate(-50%, 0)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: var(--card-initial-transform, translate(-50%, 0)) translateY(120px) scale(0.3);
+  }
+}
+
+@keyframes clear-to-player1 { /* To Top (Player 1) */
+  0% {
+    opacity: 1;
+    transform: var(--card-initial-transform, translate(-50%, 0)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: var(--card-initial-transform, translate(-50%, 0)) translateY(-120px) scale(0.3);
+  }
+}
+
+@keyframes clear-to-player2 { /* To Left (Player 2) */
+  0% {
+    opacity: 1;
+    transform: var(--card-initial-transform, translate(0, -50%)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: var(--card-initial-transform, translate(0, -50%)) translateX(-150px) scale(0.3);
+  }
+}
+
+@keyframes clear-to-player3 { /* To Right (Player 3) */
+  0% {
+    opacity: 1;
+    transform: var(--card-initial-transform, translate(0, -50%)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: var(--card-initial-transform, translate(0, -50%)) translateX(150px) scale(0.3);
+  }
+}
+
+/* Apply animations to cards when clearing to a specific player */
+.clearing-to-player-0 .trick-card-wrapper {
+  /* Attempt to preserve original centering transform if card was bottom/top */
+  --card-initial-transform: translate(-50%, 0);
+  animation: clear-to-player0 1s ease-out forwards;
+}
+
+.clearing-to-player-1 .trick-card-wrapper {
+  --card-initial-transform: translate(-50%, 0);
+  animation: clear-to-player1 1s ease-out forwards;
+}
+
+.clearing-to-player-2 .trick-card-wrapper {
+  /* Attempt to preserve original centering transform if card was left/right */
+  --card-initial-transform: translate(0, -50%);
+  animation: clear-to-player2 1s ease-out forwards;
+}
+
+.clearing-to-player-3 .trick-card-wrapper {
+  --card-initial-transform: translate(0, -50%);
+  animation: clear-to-player3 1s ease-out forwards;
 }
 
 /* Responsive adjustments */
