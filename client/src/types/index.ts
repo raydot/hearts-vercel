@@ -24,6 +24,7 @@ export interface GameStateContextType {
     currentTurn: number
     gameOver: boolean
     trickCards: Card[]
+    trickPlayerIndices: number[]
     tricks: Card[][][]
     scores: number[]
     heartsBroken: boolean

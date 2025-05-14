@@ -17,7 +17,9 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     const [currentTurn, setCurrentTurn] = useState<number>(0)
     const [gameOver, setGameOver] = useState<boolean>(false)
     const [trickCards, setTrickCards] = useState<Card[]>([])
+    const [trickPlayerIndices, setTrickPlayerIndices] = useState<number[]>([])
     const [isClearingTrick, setIsClearingTrick] = useState<boolean>(false)
+    const [trickAnimationTargetPlayer, setTrickAnimationTargetPlayer] = useState<number | null>(null)
     const [tricks, setTricks] = useState<Card[][][]>([[], [], [], []])
     const [scores, setScores] = useState<number[]>([0, 0, 0, 0])
     const [heartsBroken, setHeartsBroken] = useState<boolean>(false)
@@ -60,49 +62,67 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
         // Update state based on the result
         setPlayerHands(result.newHands)
         setTrickCards(result.newTrickCards)
+        
+        // Update the player indices for the trick cards
+        // This tracks which player played each card in the trick
+        // Append the current player's index to the array of player indices for the current trick.
+        // This ensures that trickPlayerIndices always corresponds to trickCards.
+        setTrickPlayerIndices(prev => [...prev, playerIndex]);
+        
         setHeartsBroken(result.newHeartsBroken)
         
         if (result.trickComplete) {
             // Trick is complete
             console.log('Trick complete! Winner:', result.winnerIndex)
             
-            // Mark that we're in the process of clearing a trick
-            setIsClearingTrick(true)
-            
-            // Update tricks and scores immediately
+            // Update tricks and scores immediately (these don't directly affect card display before clearing)
             setTricks(result.newTricks)
             setScores(result.scores)
             
             // Store the current trick cards in a local variable before clearing
-            const completedTrick = [...result.newTrickCards]
-            console.log('Completed trick (before clearing):', completedTrick)
+            // const completedTrick = [...result.newTrickCards] // Not strictly needed here anymore for this logic
+            // console.log('Completed trick (before clearing):', completedTrick)
             
             // Check if hand is over (all players have played all their cards)
             const handIsOver = result.newHands.every(hand => hand.length === 0);
             
-            // Delay clearing the trick cards
+            // Delay setting isClearingTrick to allow the 4th card to render first
             setTimeout(() => {
-                console.log('Clearing trick cards now')
-                setTrickCards([]) // Reset the trick cards array
-                setLeadPlayer(result.winnerIndex)
-                setCurrentTurn(result.winnerIndex)
-                setIsClearingTrick(false) // Mark that we're done clearing
-                
-                if (handIsOver) {
-                    console.log('Hand is over! Final scores:', result.scores);
-                    // Wait a bit longer before starting a new hand
-                    setTimeout(() => {
-                        // Deal new cards for the next hand
-                        dealCards();
-                    }, 2000);
-                }
-                
-                // Check if game is over (someone has reached 100 points)
-                if (checkGameEnd(result.newHands) || result.scores.some(score => score >= 100)) {
-                    setGameOver(true);
-                    console.log('Game over! Final scores:', result.scores);
-                }
-            }, 1000) // 1 second delay
+                console.log('Starting trick clearing visual phase for winner:', result.winnerIndex)
+                setTrickAnimationTargetPlayer(result.winnerIndex); // Set target for animation
+                setIsClearingTrick(true); // Now, activate the clearing visual state
+
+                // After the visual clearing phase (e.g., animation duration), clear data and set up next turn/hand.
+                setTimeout(() => {
+                    console.log('Clearing trick cards data now')
+                    setTrickCards([]) // Reset the trick cards array
+                    setTrickPlayerIndices([]) // Reset the player indices
+                    setLeadPlayer(result.winnerIndex)
+                    setCurrentTurn(result.winnerIndex)
+                    setIsClearingTrick(false) // Mark that we're done clearing visually
+                    setTrickAnimationTargetPlayer(null); // Reset animation target
+                    
+                    if (handIsOver) {
+                        console.log('Hand is over! Final scores:', result.scores);
+                        // Wait a bit longer before starting a new hand
+                        setTimeout(() => {
+                            // Deal new cards for the next hand
+                            dealCards();
+                        }, 2000); // Delay before new hand deal
+                    }
+                    
+                    // Check if game is over (someone has reached 100 points)
+                    // This check should probably happen after scores are updated and before a new hand is dealt if handIsOver is true
+                    if (!handIsOver && (checkGameEnd(result.newHands) || result.scores.some(score => score >= 100))) {
+                        setGameOver(true);
+                        console.log('Game over! Final scores:', result.scores);
+                    } else if (handIsOver && result.scores.some(score => score >= 100)){
+                        // If hand is over and scores hit limit, it's game over.
+                        setGameOver(true);
+                        console.log('Game over! Final scores after hand:', result.scores);
+                    }
+                }, 1000); // Duration for the clearing animation / visual phase
+            }, 500); // Short delay (e.g., 150ms) to show the 4th card before visual clearing starts
         } else {
             // Move to next player clockwise
             // Player positions: 0 = South (human), 1 = North, 2 = West, 3 = East
@@ -150,10 +170,12 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
                 currentTurn,
                 gameOver,
                 trickCards,
+                trickPlayerIndices,
                 tricks,
                 scores,
                 heartsBroken,
                 isClearingTrick,
+                trickAnimationTargetPlayer,
                 dealCards,
                 playCard,
                 handleComputerTurn,

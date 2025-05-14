@@ -16,6 +16,7 @@ const Game = () => {
     currentTurn,
     gameOver,
     trickCards,
+    trickPlayerIndices,
     tricks,
     scores,
     heartsBroken,
@@ -117,6 +118,7 @@ const Game = () => {
           currentTurn={currentTurn}
           onCardClick={handleCardClick}
           trickCards={trickCards}
+          trickPlayerIndices={trickPlayerIndices}
           isCardPlayable={isCardPlayable}
           isClearingTrick={isClearingTrick}
         />

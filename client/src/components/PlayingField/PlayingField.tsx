@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useContext } from "react"
 import PlayerHand from "@/components/PlayerHand/PlayerHand"
 import Player from "@/components/Player/Player"
 import Card from "@/components/Card/Card"
 import { Card as CardType } from "@/types"
+import { GameStateContext } from "@/context/GameStateProvider"
 
 import "./PlayingField.css"
 
@@ -11,20 +12,43 @@ interface PlayingFieldProps {
   currentTurn: number
   onCardClick: (card: CardType) => void
   trickCards?: CardType[]
+  trickPlayerIndices?: number[]
   isCardPlayable?: (card: CardType) => boolean
-  isClearingTrick?: boolean
 }
 
 const PlayingField: React.FC<PlayingFieldProps> = ({
   playerHands,
   currentTurn,
   onCardClick,
-  trickCards,
-  isCardPlayable,
-  isClearingTrick
+  trickCards: propsTrickCards = [],
+  trickPlayerIndices: propsTrickPlayerIndices = [],
+  isCardPlayable = () => true,
 }) => {
-  // Make sure the player has a hand
+  const context = useContext(GameStateContext);
+  if (!context) {
+    console.error("GameStateContext not found");
+    return null;
+  }
+
+  const {
+    trickCards: contextTrickCards,
+    trickPlayerIndices: contextTrickPlayerIndices,
+    isClearingTrick,
+    trickAnimationTargetPlayer
+  } = context;
+
+  const currentTrickCards = propsTrickCards.length > 0 ? propsTrickCards : contextTrickCards;
+  const currentTrickPlayerIndices = propsTrickPlayerIndices.length > 0 ? propsTrickPlayerIndices : contextTrickPlayerIndices;
+
   const playerHand = playerHands[0] || []
+
+  let trickContainerClassName = "";
+  if (isClearingTrick) {
+    trickContainerClassName = "trick-clearing";
+    if (trickAnimationTargetPlayer !== null) {
+      trickContainerClassName += ` clearing-to-player-${trickAnimationTargetPlayer}`;
+    }
+  }
 
   return (
     <div className="playingField green-felt" data-testid="playing-field" style={{ width: '100%', minWidth: '800px' }}>
@@ -41,31 +65,37 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
         
         {/* Center play area for trick cards */}
         <div className="center-play-area" data-testid="center-play-area">
-          {trickCards && trickCards.length > 0 ? (
-            // Add a visual indicator if we're in the clearing phase
-            <div className={isClearingTrick ? 'trick-clearing' : ''}>
-              {trickCards.slice(0, 4).map((card, index) => {
-                // Position cards based on which player played them
-                // Calculate positions for each player's card
+          {currentTrickCards && currentTrickCards.length > 0 ? (
+            <div className={trickContainerClassName}>
+              {currentTrickCards.slice(0, 4).map((card, index) => {
                 let positionStyle = {};
+                let position = 'bottom'; 
+
+                const playerIndex = currentTrickPlayerIndices[index];
+
+                if (playerIndex === 0) {
+                    position = 'bottom'; 
+                } else if (playerIndex === 1) {
+                    position = 'top';    
+                } else if (playerIndex === 2) {
+                    position = 'left';   
+                } else if (playerIndex === 3) {
+                    position = 'right';  
+                } else {
+                    position = 'bottom'; 
+                }
                 
-                // Determine the player position based on the lead player and card index
-                // Player positions: 0 = South (human), 1 = North, 2 = West, 3 = East
-                const playerPositions = ['bottom', 'top', 'left', 'right'];
-                const position = playerPositions[index];
-                
-                // Set position based on which player played the card
                 switch(position) {
-                  case 'bottom': // South (human)
+                  case 'bottom': 
                     positionStyle = { bottom: '-30px', left: '50%', transform: 'translateX(-50%)' };
                     break;
-                  case 'top': // North
+                  case 'top': 
                     positionStyle = { top: '-30px', left: '50%', transform: 'translateX(-50%)' };
                     break;
-                  case 'left': // West
+                  case 'left': 
                     positionStyle = { left: '-30px', top: '50%', transform: 'translateY(-50%)' };
                     break;
-                  case 'right': // East
+                  case 'right': 
                     positionStyle = { right: '-30px', top: '50%', transform: 'translateY(-50%)' };
                     break;
                   default:
