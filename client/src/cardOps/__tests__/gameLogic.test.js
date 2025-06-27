@@ -1,4 +1,4 @@
-{{ ... }}
+import { determineTrickWinner } from '../gameLogic';
 
 // Assuming Card, Suit, Rank can be imported like this or adjust as per your project structure
 // import { Card, Suit, Rank } from '@/types'; 
@@ -100,4 +100,3 @@ describe('determineTrickWinner', () => {
   });
 
 });
-{{ ... }}

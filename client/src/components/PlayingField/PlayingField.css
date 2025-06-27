@@ -162,48 +162,153 @@
   100% { opacity: 1; }
 }
 
-/* Keyframes for clearing trick cards to player positions */
+/* Winner indicator arrow styles */
+.winner-indicator {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 215, 0, 0.8); /* Gold color */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: winner-pulse 1s infinite alternate;
+  z-index: 20;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+.winner-indicator::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.winner-indicator-0 { /* Bottom player */
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.winner-indicator-0::before {
+  border-width: 15px 10px 0 10px;
+  border-color: rgba(255, 215, 0, 0.8) transparent transparent transparent;
+  position: absolute;
+  bottom: -15px;
+}
+
+.winner-indicator-1 { /* Left player */
+  left: 100px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.winner-indicator-1::before {
+  border-width: 10px 15px 10px 0;
+  border-color: transparent rgba(255, 215, 0, 0.8) transparent transparent;
+  position: absolute;
+  left: -15px;
+}
+
+.winner-indicator-2 { /* Top player */
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.winner-indicator-2::before {
+  border-width: 0 10px 15px 10px;
+  border-color: transparent transparent rgba(255, 215, 0, 0.8) transparent;
+  position: absolute;
+  top: -15px;
+}
+
+.winner-indicator-3 { /* Right player */
+  right: 100px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.winner-indicator-3::before {
+  border-width: 10px 0 10px 15px;
+  border-color: transparent transparent transparent rgba(255, 215, 0, 0.8);
+  position: absolute;
+  right: -15px;
+}
+
+@keyframes winner-pulse {
+  0% { transform: scale(1) translateX(-50%); }
+  100% { transform: scale(1.2) translateX(-42%); }
+}
+
+@keyframes winner-pulse-vertical {
+  0% { transform: scale(1) translateY(-50%); }
+  100% { transform: scale(1.2) translateY(-42%); }
+}
+
+.winner-indicator-1,
+.winner-indicator-3 {
+  animation: winner-pulse-vertical 1s infinite alternate;
+}
+
+/* Enhanced keyframes for clearing trick cards to player positions */
 @keyframes clear-to-player0 { /* To Bottom (Player 0) */
   0% {
     opacity: 1;
-    transform: var(--card-initial-transform, translate(-50%, 0)) scale(1);
+    transform: var(--card-initial-transform, translate(-50%, 0)) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: var(--card-initial-transform, translate(-50%, 60px)) scale(0.7) rotate(10deg);
   }
   100% {
     opacity: 0;
-    transform: var(--card-initial-transform, translate(-50%, 0)) translateY(120px) scale(0.3);
+    transform: var(--card-initial-transform, translate(-50%, 150px)) scale(0.3) rotate(20deg);
   }
 }
 
-@keyframes clear-to-player1 { /* To Top (Player 1) */
+@keyframes clear-to-player1 { /* To Left (Player 1) */
   0% {
     opacity: 1;
-    transform: var(--card-initial-transform, translate(-50%, 0)) scale(1);
+    transform: var(--card-initial-transform, translate(-50%, 0)) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: var(--card-initial-transform, translate(-100px, 0)) scale(0.7) rotate(-10deg);
   }
   100% {
     opacity: 0;
-    transform: var(--card-initial-transform, translate(-50%, 0)) translateY(-120px) scale(0.3);
+    transform: var(--card-initial-transform, translate(-180px, 0)) scale(0.3) rotate(-20deg);
   }
 }
 
-@keyframes clear-to-player2 { /* To Left (Player 2) */
+@keyframes clear-to-player2 { /* To Top (Player 2) */
   0% {
     opacity: 1;
-    transform: var(--card-initial-transform, translate(0, -50%)) scale(1);
+    transform: var(--card-initial-transform, translate(0, -50%)) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: var(--card-initial-transform, translate(0, -100px)) scale(0.7) rotate(-10deg);
   }
   100% {
     opacity: 0;
-    transform: var(--card-initial-transform, translate(0, -50%)) translateX(-150px) scale(0.3);
+    transform: var(--card-initial-transform, translate(0, -180px)) scale(0.3) rotate(-20deg);
   }
 }
 
 @keyframes clear-to-player3 { /* To Right (Player 3) */
   0% {
     opacity: 1;
-    transform: var(--card-initial-transform, translate(0, -50%)) scale(1);
+    transform: var(--card-initial-transform, translate(0, -50%)) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: var(--card-initial-transform, translate(100px, 0)) scale(0.7) rotate(10deg);
   }
   100% {
     opacity: 0;
-    transform: var(--card-initial-transform, translate(0, -50%)) translateX(150px) scale(0.3);
+    transform: var(--card-initial-transform, translate(180px, 0)) scale(0.3) rotate(20deg);
   }
 }
 

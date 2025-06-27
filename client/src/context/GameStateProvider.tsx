@@ -73,7 +73,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
             trickCards,
             tricks,
             heartsBroken,
-            leadPlayer,
+
             newTrickPlayerIndices // Pass the updated trick player indices
         );
         console.log(`[playCard] Game engine result:`, {
@@ -140,8 +140,8 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
             let nextPlayer;
             switch(playerIndex) {
                 case 0: nextPlayer = 1; break; // South → West
-                case 1: nextPlayer = 2; break; // North → East
-                case 2: nextPlayer = 3; break; // West → North
+                case 1: nextPlayer = 2; break; // West → North
+                case 2: nextPlayer = 3; break; // North → East
                 case 3: nextPlayer = 0; break; // East → South
                 default: nextPlayer = 0;
             }

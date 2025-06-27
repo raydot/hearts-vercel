@@ -160,7 +160,7 @@ describe('GameStateProvider', () => {
 
     // Advance timers to trigger the setTimeout for clearing trick
     await act(async () => {
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1500);
     });
 
     // Winner of the trick (South) should be the next player

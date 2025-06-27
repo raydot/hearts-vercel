@@ -2,6 +2,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import PlayingField from './PlayingField';
 import { Card as CardType } from '@/types';
+import { GameStateContext } from '@/context/GameStateProvider';
 
 describe('PlayingField Component', () => {
   // Mock empty hands for basic tests
@@ -17,6 +18,34 @@ describe('PlayingField Component', () => {
   
   const mockOnCardClick = vi.fn();
   
+  // Mock GameStateContext
+  const mockGameStateContext = {
+    playerHands: emptyHands,
+    currentTurn: 0,
+    gameOver: false,
+    trickCards: [],
+    trickPlayerIndices: [],
+    tricks: [[], [], [], []],
+    scores: [0, 0, 0, 0],
+    heartsBroken: false,
+    isClearingTrick: false,
+    trickAnimationTargetPlayer: null,
+    isProcessingTrickEnd: false,
+    dealCards: vi.fn(),
+    playCard: vi.fn(),
+    handleComputerTurn: vi.fn(),
+    isCardPlayable: vi.fn().mockReturnValue(true)
+  };
+  
+  // Wrap component with context provider
+  const renderWithContext = (ui: React.ReactElement, contextValue = mockGameStateContext) => {
+    return render(
+      <GameStateContext.Provider value={contextValue}>
+        {ui}
+      </GameStateContext.Provider>
+    );
+  };
+  
   beforeEach(() => {
     mockOnCardClick.mockClear();
   });
@@ -26,7 +55,7 @@ describe('PlayingField Component', () => {
   });
   
   test('renders the playing field with green felt background', () => {
-    render(
+    renderWithContext(
       <PlayingField 
         playerHands={emptyHands} 
         currentTurn={0} 
@@ -40,7 +69,7 @@ describe('PlayingField Component', () => {
   });
   
   test('positions players correctly around the table', () => {
-    render(
+    renderWithContext(
       <PlayingField 
         playerHands={emptyHands} 
         currentTurn={0} 
@@ -67,7 +96,7 @@ describe('PlayingField Component', () => {
   });
   
   test('highlights the current player\'s turn', () => {
-    render(
+    renderWithContext(
       <PlayingField 
         playerHands={emptyHands} 
         currentTurn={2} // Computer 2's turn
@@ -75,20 +104,20 @@ describe('PlayingField Component', () => {
       />
     );
     
-    const topPlayer = screen.getByTestId('player-top'); // Computer 1
-    const leftPlayer = screen.getByTestId('player-left'); // Computer 2
-    const rightPlayer = screen.getByTestId('player-right'); // Computer 3
-    const bottomPlayer = screen.getByTestId('player-bottom'); // Human
+    const topPlayer = screen.getByTestId('player-top'); // Computer 2 (North)
+    const leftPlayer = screen.getByTestId('player-left'); // Computer 1 (West)
+    const rightPlayer = screen.getByTestId('player-right'); // Computer 3 (East)
+    const bottomPlayer = screen.getByTestId('player-bottom'); // Human (South)
     
-    expect(topPlayer).not.toHaveClass('active');
-    expect(leftPlayer).toHaveClass('active');
+    expect(topPlayer).toHaveClass('active'); // Computer 2's turn (currentTurn=2)
+    expect(leftPlayer).not.toHaveClass('active');
     expect(rightPlayer).not.toHaveClass('active');
     expect(bottomPlayer).not.toHaveClass('active');
   });
   
 
   test('renders the player\'s hand with actual cards', () => {
-    render(
+    renderWithContext(
       <PlayingField 
         playerHands={populatedHands} 
         currentTurn={0} 
@@ -108,16 +137,23 @@ describe('PlayingField Component', () => {
   });
   
   test('renders a center play area for trick cards', () => {
-    render(
+    // Create a context with trick cards
+    const contextWithTrickCards = {
+      ...mockGameStateContext,
+      trickCards: [
+        { suit: 'clubs', rank: '2' },
+        { suit: 'clubs', rank: '5' }
+      ],
+      trickPlayerIndices: [0, 1]
+    };
+    
+    renderWithContext(
       <PlayingField 
         playerHands={emptyHands} 
         currentTurn={0} 
         onCardClick={mockOnCardClick} 
-        trickCards={[
-          { suit: 'clubs', rank: '2' },
-          { suit: 'clubs', rank: '5' }
-        ]}
-      />
+      />,
+      contextWithTrickCards
     );
     
     const centerArea = screen.getByTestId('center-play-area');

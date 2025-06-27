@@ -9,7 +9,7 @@ const isFirstTrick = (_playerHands: Card[][], tricks: Card[][][]): boolean => {
 };
 
 // Get numeric value of card rank
-const getCardValue = (rank: string): number => {
+export const getCardValue = (rank: string): number => {
   const rankValues: Record<string, number> = {
     '2': 2,
     '3': 3,
@@ -117,16 +117,36 @@ export const determineTrickWinner = (trickCards: Card[], leadPlayerIndex: number
   return winnerIndex;
 };
 
-export const calculateScore = (tricks: Card[][][]): number[] => {
+export const calculateScore = (tricks: Card[][][] | Card[][]): number[] => {
   const scores = [0, 0, 0, 0];
 
+  // Handle both data structures: Card[][][] from game engine and Card[][] from tests
   tricks.forEach((playerTricks, playerIndex) => {
-    playerTricks.forEach((card) => {
-      if (card.suit === 'hearts') {
-        scores[playerIndex] += 1;
-      }
-      if (card.suit === 'spades' && card.rank === 'Q') {
-        scores[playerIndex] += 13;
+    if (!playerTricks) return;
+    
+    playerTricks.forEach((item) => {
+      // Check if item is a Card or an array of Cards
+      if (item && typeof item === 'object') {
+        if ('suit' in item) {
+          // Direct Card object (test structure)
+          const card = item as Card;
+          if (card.suit === 'hearts') {
+            scores[playerIndex] += 1;
+          }
+          if (card.suit === 'spades' && card.rank === 'Q') {
+            scores[playerIndex] += 13;
+          }
+        } else if (Array.isArray(item)) {
+          // Array of Cards (game engine structure)
+          item.forEach((card) => {
+            if (card.suit === 'hearts') {
+              scores[playerIndex] += 1;
+            }
+            if (card.suit === 'spades' && card.rank === 'Q') {
+              scores[playerIndex] += 13;
+            }
+          });
+        }
       }
     });
   });

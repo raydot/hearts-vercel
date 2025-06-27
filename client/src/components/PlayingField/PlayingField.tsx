@@ -61,11 +61,11 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
   return (
     <div className="playingField green-felt" data-testid="playing-field" style={{ width: '100%', minWidth: '800px' }}>
       <div className="felt-table">
-        <div className={`player top ${currentTurn === 1 ? "active" : ""}`} data-testid="player-top">
-          <Player name="Computer 1" isComputer={true} position="top" />
+        <div className={`player top ${currentTurn === 2 ? "active" : ""}`} data-testid="player-top">
+          <Player name="Computer 2" isComputer={true} position="top" />
         </div>
-        <div className={`player left ${currentTurn === 2 ? "active" : ""}`} data-testid="player-left">
-          <Player name="Computer 2" isComputer={true} position="left" />
+        <div className={`player left ${currentTurn === 1 ? "active" : ""}`} data-testid="player-left">
+          <Player name="Computer 1" isComputer={true} position="left" />
         </div>
         <div className={`player right ${currentTurn === 3 ? "active" : ""}`} data-testid="player-right">
           <Player name="Computer 3" isComputer={true} position="right" />
@@ -73,6 +73,16 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
         
         {/* Center play area for trick cards */}
         <div className="center-play-area" data-testid="center-play-area">
+          {/* Winner indicator that appears during trick clearing */}
+          {isClearingTrick && trickAnimationTargetPlayer !== null && (
+            <div 
+              className={`winner-indicator winner-indicator-${trickAnimationTargetPlayer}`}
+              data-testid="winner-indicator"
+            >
+              <span style={{ fontSize: '24px', color: '#fff', fontWeight: 'bold' }}>+</span>
+            </div>
+          )}
+          
           {currentTrickCards && currentTrickCards.length > 0 ? (
             <div className={trickContainerClassName}>
               {currentTrickCards.slice(0, 4).map((card, index) => {
@@ -84,9 +94,9 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
                 if (playerIndex === 0) {
                     position = 'bottom'; 
                 } else if (playerIndex === 1) {
-                    position = 'top';    
+                    position = 'left';    
                 } else if (playerIndex === 2) {
-                    position = 'left';   
+                    position = 'top';   
                 } else if (playerIndex === 3) {
                     position = 'right';  
                 } else {

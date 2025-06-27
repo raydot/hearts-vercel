@@ -1,5 +1,5 @@
 import { Card, Suit, Rank, GameState } from '@/types';
-import { isValidMove, determineTrickWinner, calculateScore, checkGameEnd } from '@/cardOps/gameLogic';
+import { isValidMove, calculateScore, getCardValue } from '@/cardOps/gameLogic';
 
 /**
  * Creates and shuffles a deck of cards
@@ -94,7 +94,7 @@ export function playCard(
   trickCards: Card[],
   tricks: Card[][][],
   heartsBroken: boolean,
-  leadPlayer: number,
+
   trickPlayerIndices: number[] = [] // Add optional parameter for trickPlayerIndices
 ): {
   newHands: Card[][],
@@ -145,7 +145,13 @@ export function playCard(
     
     // Add trick to winner's tricks
     newTricks = [...tricks];
-    newTricks[winnerIndex] = [...newTricks[winnerIndex], ...newTrickCards];
+    if (Array.isArray(newTricks[winnerIndex])) {
+      // If it's already an array of arrays, add the new trick
+      newTricks[winnerIndex] = [...newTricks[winnerIndex], newTrickCards];
+    } else {
+      // Initialize with the new trick as the first element
+      newTricks[winnerIndex] = [newTrickCards];
+    }
     
     // Calculate scores
     scores = calculateScore(newTricks);
@@ -210,7 +216,18 @@ export function getNextState (
   currentState: GameState, 
   action: {type: 'PLAY_CARD', card: Card, playerIndex: number} | {type: 'DEAL_CARDS'}
 ): GameState {
-  // pure function blah blah
-  // Implementation
+  // Handle different action types
+  switch (action.type) {
+    case 'PLAY_CARD':
+      // In a real implementation, we would handle playing a card here
+      console.log('Playing card:', action.card, 'by player', action.playerIndex);
+      break;
+    case 'DEAL_CARDS':
+      // In a real implementation, we would handle dealing cards here
+      console.log('Dealing cards');
+      break;
+  }
+  
+  // For now, just return the current state
   return currentState;
 }
