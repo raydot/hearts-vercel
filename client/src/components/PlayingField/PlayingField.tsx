@@ -24,6 +24,9 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
   trickPlayerIndices: propsTrickPlayerIndices = [],
   isCardPlayable = () => true,
 }) => {
+  console.log('PlayingField: Received playerHands[0] (Human):', JSON.stringify(playerHands[0]));
+  console.log('PlayingField: Received playerHands[3] (Comp3):', JSON.stringify(playerHands[3]));
+
   const context = useContext(GameStateContext);
   if (!context) {
     console.error("GameStateContext not found");
@@ -32,13 +35,18 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
 
   const {
     trickCards: contextTrickCards,
-    trickPlayerIndices: contextTrickPlayerIndices,
+    trickPlayerIndices: contextTrickPlayerIndicesFromContext,
     isClearingTrick,
     trickAnimationTargetPlayer
   } = context;
 
   const currentTrickCards = propsTrickCards.length > 0 ? propsTrickCards : contextTrickCards;
-  const currentTrickPlayerIndices = propsTrickPlayerIndices.length > 0 ? propsTrickPlayerIndices : contextTrickPlayerIndices;
+  const actualTrickPlayerIndices = propsTrickPlayerIndices.length > 0 ? propsTrickPlayerIndices : contextTrickPlayerIndicesFromContext;
+
+  console.log('PlayingField: Received propsTrickPlayerIndices:', JSON.stringify(propsTrickPlayerIndices));
+  console.log('PlayingField: Context trickPlayerIndices:', JSON.stringify(contextTrickPlayerIndicesFromContext));
+  console.log('PlayingField: actualTrickPlayerIndices being used:', JSON.stringify(actualTrickPlayerIndices));
+  console.log('PlayingField: currentTrickCards being used:', JSON.stringify(currentTrickCards));
 
   const playerHand = playerHands[0] || []
 
@@ -71,7 +79,7 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
                 let positionStyle = {};
                 let position = 'bottom'; 
 
-                const playerIndex = currentTrickPlayerIndices[index];
+                const playerIndex = actualTrickPlayerIndices[index];
 
                 if (playerIndex === 0) {
                     position = 'bottom'; 

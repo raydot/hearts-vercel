@@ -104,31 +104,31 @@ describe('GameStateProvider', () => {
       screen.getByTestId('play-card-button').click();
     });
 
-    // Next turn should be West (2) - clockwise from South
-    expect(screen.getByTestId('current-turn').textContent).toBe('2');
+    // Next turn should be West (1) - clockwise from South
+    expect(screen.getByTestId('current-turn').textContent).toBe('1');
 
-    // Update mock to simulate West (2) playing a card
+    // Update mock to simulate West (1) playing a card
     mockPlayCardResult.newTrickCards = [
       { suit: 'clubs', rank: '2' },
       { suit: 'clubs', rank: '4' }
     ];
 
-    // Play a card as West (2)
+    // Play a card as West (1)
     await act(async () => {
       screen.getByTestId('play-card-button').click();
     });
 
-    // Next turn should be North (1) - clockwise from West
-    expect(screen.getByTestId('current-turn').textContent).toBe('1');
+    // Next turn should be North (2) - clockwise from West
+    expect(screen.getByTestId('current-turn').textContent).toBe('2');
 
-    // Update mock to simulate North (1) playing a card
+    // Update mock to simulate North (2) playing a card
     mockPlayCardResult.newTrickCards = [
       { suit: 'clubs', rank: '2' },
       { suit: 'clubs', rank: '4' },
       { suit: 'clubs', rank: '5' }
     ];
 
-    // Play a card as North (1)
+    // Play a card as North (2)
     await act(async () => {
       screen.getByTestId('play-card-button').click();
     });
@@ -145,6 +145,13 @@ describe('GameStateProvider', () => {
     ];
     mockPlayCardResult.trickComplete = true;
     mockPlayCardResult.winnerIndex = 0; // South wins the trick
+
+    // Make sure the mock function returns the updated result
+    (gameEngine.playCard as any).mockReturnValue({
+      ...mockPlayCardResult,
+      trickComplete: true,
+      winnerIndex: 0 // South wins the trick
+    });
 
     // Play a card as East (3)
     await act(async () => {

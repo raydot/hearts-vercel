@@ -94,7 +94,8 @@ export function playCard(
   trickCards: Card[],
   tricks: Card[][][],
   heartsBroken: boolean,
-  leadPlayer: number
+  leadPlayer: number,
+  trickPlayerIndices: number[] = [] // Add optional parameter for trickPlayerIndices
 ): {
   newHands: Card[][],
   newTrickCards: Card[],
@@ -113,6 +114,10 @@ export function playCard(
   // Add card to current trick
   const newTrickCards = [...trickCards, card];
   
+  // Update trickPlayerIndices to include this player if not provided
+  const updatedTrickPlayerIndices = [...(trickPlayerIndices || []), playerIndex];
+  console.log('Updated trick player indices:', updatedTrickPlayerIndices);
+  
   // Check if hearts are broken
   const newHeartsBroken = heartsBroken || card.suit === 'hearts';
   
@@ -125,9 +130,18 @@ export function playCard(
   // If all players have played a card, determine the winner
   if (newTrickCards.length === 4) {
     trickComplete = true;
-    winnerIndex = determineTrickWinner(newTrickCards, leadPlayer);
+    
+    // Find the index of the highest card in the trick array
+    const highestCardIndex = findHighestCardIndex(newTrickCards);
+    
+    // Use the trickPlayerIndices to get the actual player who played the winning card
+    winnerIndex = updatedTrickPlayerIndices[highestCardIndex];
+    
     console.log('Trick complete! Winner:', winnerIndex, 'Cards:', newTrickCards);
     console.log('Trick length check:', newTrickCards.length);
+    console.log('Highest card index in trick:', highestCardIndex);
+    console.log('Player indices:', updatedTrickPlayerIndices);
+    console.log('Winner is player:', winnerIndex);
     
     // Add trick to winner's tricks
     newTricks = [...tricks];
@@ -149,6 +163,30 @@ export function playCard(
     winnerIndex,
     scores
   };
+}
+
+/**
+ * Finds the index of the highest card in the trick that matches the lead suit
+ */
+function findHighestCardIndex(trickCards: Card[]): number {
+  if (trickCards.length === 0) return -1;
+  
+  const leadSuit = trickCards[0].suit;
+  let highestRankIndex = 0;
+  let highestRankValue = getCardValue(trickCards[0].rank);
+  
+  for (let i = 1; i < trickCards.length; i++) {
+    const card = trickCards[i];
+    const cardValue = getCardValue(card.rank);
+    
+    // Only cards of the lead suit can win the trick
+    if (card.suit === leadSuit && cardValue > highestRankValue) {
+      highestRankIndex = i;
+      highestRankValue = cardValue;
+    }
+  }
+  
+  return highestRankIndex;
 }
 
 /**

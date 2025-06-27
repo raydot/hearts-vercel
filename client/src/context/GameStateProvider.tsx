@@ -24,11 +24,14 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
     const [scores, setScores] = useState<number[]>([0, 0, 0, 0])
     const [heartsBroken, setHeartsBroken] = useState<boolean>(false)
     const [leadPlayer, setLeadPlayer] = useState<number>(0)
+    const [isProcessingTrickEnd, setIsProcessingTrickEnd] = useState<boolean>(false);
 
     // Deal cards function
     const dealCards = useCallback(() => {
         // Use game engine to create hands
         const newHands = gameEngine.dealCards()
+        console.log('GameStateProvider: dealCards - newHands[0] (Human):', JSON.stringify(newHands[0]));
+        console.log('GameStateProvider: dealCards - newHands[3] (Comp3):', JSON.stringify(newHands[3]));
         setPlayerHands(newHands)
         
         // Find player with 2 of clubs to start
@@ -46,9 +49,23 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
 
     // Play a card
     const playCard = useCallback((card: Card, playerIndex: number) => {
-        console.log(`Player ${playerIndex} playing ${card.rank} of ${card.suit}`)
-        
-        // Use game engine to handle the card play
+        // Prevent playing cards during trick processing
+        if (isProcessingTrickEnd) {
+            console.log('Prevented card play during trick processing');
+            return;
+        }
+
+        console.log(`[playCard] Player ${playerIndex} playing card:`, card);
+        console.log(`[playCard] Current trick player indices:`, trickPlayerIndices);
+        console.log(`[playCard] Current trick cards:`, trickCards);
+        console.log(`[playCard] Current lead player:`, leadPlayer);
+
+        // Add the player index to the trick player indices
+        const newTrickPlayerIndices = [...trickPlayerIndices, playerIndex];
+        setTrickPlayerIndices(newTrickPlayerIndices);
+        console.log(`[playCard] Updated trick player indices:`, newTrickPlayerIndices);
+
+        // Pass trickPlayerIndices to gameEngine.playCard
         const result = gameEngine.playCard(
             card,
             playerIndex,
@@ -56,95 +73,87 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
             trickCards,
             tricks,
             heartsBroken,
-            leadPlayer
-        )
-        
-        // Update state based on the result
-        setPlayerHands(result.newHands)
-        setTrickCards(result.newTrickCards)
-        
-        // Update the player indices for the trick cards
-        // This tracks which player played each card in the trick
-        // Append the current player's index to the array of player indices for the current trick.
-        // This ensures that trickPlayerIndices always corresponds to trickCards.
-        setTrickPlayerIndices(prev => [...prev, playerIndex]);
+            leadPlayer,
+            newTrickPlayerIndices // Pass the updated trick player indices
+        );
+        console.log(`[playCard] Game engine result:`, {
+            trickComplete: result.trickComplete,
+            winnerIndex: result.winnerIndex,
+            newTrickCards: result.newTrickCards
+        });
+
+        setPlayerHands(result.newHands);
+        setTrickCards(result.newTrickCards);
         
         setHeartsBroken(result.newHeartsBroken)
         
         if (result.trickComplete) {
-            // Trick is complete
-            console.log('Trick complete! Winner:', result.winnerIndex)
+            setIsProcessingTrickEnd(true); // Set lock immediately
+            console.log('[playCard] Trick complete! Winner:', result.winnerIndex);
+            console.log('[playCard] Trick player indices at completion:', newTrickPlayerIndices);
+            console.log('[playCard] Trick cards at completion:', result.newTrickCards);
             
-            // Update tricks and scores immediately (these don't directly affect card display before clearing)
-            setTricks(result.newTricks)
-            setScores(result.scores)
-            
-            // Store the current trick cards in a local variable before clearing
-            // const completedTrick = [...result.newTrickCards] // Not strictly needed here anymore for this logic
-            // console.log('Completed trick (before clearing):', completedTrick)
-            
-            // Check if hand is over (all players have played all their cards)
-            const handIsOver = result.newHands.every(hand => hand.length === 0);
-            
-            // Delay setting isClearingTrick to allow the 4th card to render first
             setTimeout(() => {
-                console.log('Starting trick clearing visual phase for winner:', result.winnerIndex)
-                setTrickAnimationTargetPlayer(result.winnerIndex); // Set target for animation
-                setIsClearingTrick(true); // Now, activate the clearing visual state
+                console.log('[playCard] Starting trick clearing visual phase for winner:', result.winnerIndex)
+                setIsClearingTrick(true);
+                setTrickAnimationTargetPlayer(result.winnerIndex);
 
-                // After the visual clearing phase (e.g., animation duration), clear data and set up next turn/hand.
                 setTimeout(() => {
-                    console.log('Clearing trick cards data now')
-                    setTrickCards([]) // Reset the trick cards array
-                    setTrickPlayerIndices([]) // Reset the player indices
-                    setLeadPlayer(result.winnerIndex)
-                    setCurrentTurn(result.winnerIndex)
-                    setIsClearingTrick(false) // Mark that we're done clearing visually
-                    setTrickAnimationTargetPlayer(null); // Reset animation target
+                    console.log('[playCard] Clearing trick data from state');
+                    setIsClearingTrick(false);
+                    setTrickAnimationTargetPlayer(null);
+                    setTrickCards([]);
+                    setTrickPlayerIndices([]);
+                    
+                    setTricks(result.newTricks);
+                    setScores(result.scores);
+                    
+                    console.log('[playCard] Setting next turn to winner:', result.winnerIndex);
+                    setCurrentTurn(result.winnerIndex);
+                    setLeadPlayer(result.winnerIndex);
+                    
+                    const handIsOver = result.newHands.every(hand => hand.length === 0);
                     
                     if (handIsOver) {
                         console.log('Hand is over! Final scores:', result.scores);
-                        // Wait a bit longer before starting a new hand
-                        setTimeout(() => {
-                            // Deal new cards for the next hand
-                            dealCards();
-                        }, 2000); // Delay before new hand deal
-                    }
-                    
-                    // Check if game is over (someone has reached 100 points)
-                    // This check should probably happen after scores are updated and before a new hand is dealt if handIsOver is true
-                    if (!handIsOver && (checkGameEnd(result.newHands) || result.scores.some(score => score >= 100))) {
+                        if (result.scores.some(score => score >= 100)) {
+                            setGameOver(true);
+                            console.log('Game over! Final scores after hand:', result.scores);
+                        } else {
+                            // Wait a bit longer before starting a new hand
+                            setTimeout(() => {
+                                dealCards();
+                            }, 2000); // Delay before new hand deal
+                        }
+                    } else if (checkGameEnd(result.newHands) || result.scores.some(score => score >= 100)) {
                         setGameOver(true);
                         console.log('Game over! Final scores:', result.scores);
-                    } else if (handIsOver && result.scores.some(score => score >= 100)){
-                        // If hand is over and scores hit limit, it's game over.
-                        setGameOver(true);
-                        console.log('Game over! Final scores after hand:', result.scores);
                     }
+                    
+                    setIsProcessingTrickEnd(false); // Clear lock at the very end
                 }, 1000); // Duration for the clearing animation / visual phase
-            }, 500); // Short delay (e.g., 150ms) to show the 4th card before visual clearing starts
+            }, 500); // Short delay to show the 4th card
         } else {
             // Move to next player clockwise
-            // Player positions: 0 = South (human), 1 = North, 2 = West, 3 = East
-            // Clockwise order (north, east, south, west): 1 → 3 → 0 → 2 → 1
+            // Player positions: 0 = South (human), 1 = West, 2 = North, 3 = East
+            // Clockwise order: 0 → 1 → 2 → 3 → 0 
             let nextPlayer;
             switch(playerIndex) {
-                case 0: nextPlayer = 2; break; // South → West
-                case 1: nextPlayer = 3; break; // North → East
-                case 2: nextPlayer = 1; break; // West → North
+                case 0: nextPlayer = 1; break; // South → West
+                case 1: nextPlayer = 2; break; // North → East
+                case 2: nextPlayer = 3; break; // West → North
                 case 3: nextPlayer = 0; break; // East → South
                 default: nextPlayer = 0;
             }
             console.log(`Moving to next player: ${nextPlayer}`)
             setCurrentTurn(nextPlayer)
         }
-    }, [playerHands, trickCards, tricks, heartsBroken, leadPlayer])
+    }, [playerHands, trickCards, tricks, heartsBroken, leadPlayer, dealCards, setPlayerHands, setTrickCards, setTrickPlayerIndices, setHeartsBroken, setIsProcessingTrickEnd, setIsClearingTrick, setTrickAnimationTargetPlayer, setTricks, setScores, setCurrentTurn, setLeadPlayer, setGameOver, isProcessingTrickEnd, trickPlayerIndices]);
 
     // Handle computer moves
     const handleComputerTurn = useCallback(() => {
-        if (currentTurn !== 0 && !gameOver) {
+        if (currentTurn !== 0 && !gameOver && !isClearingTrick && !isProcessingTrickEnd) { 
             console.log(`Computer ${currentTurn}'s turn to play`)
-            // Simple delay to make it feel more natural
             setTimeout(() => {
                 const computerCard = getComputerMove(currentTurn, playerHands, trickCards, heartsBroken, tricks)
                 console.log(`Computer ${currentTurn} chose:`, computerCard)
@@ -155,7 +164,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
                 }
             }, 500)
         }
-    }, [currentTurn, gameOver, playerHands, trickCards, heartsBroken, tricks, playCard])
+    }, [currentTurn, gameOver, playerHands, trickCards, heartsBroken, tricks, playCard, isClearingTrick, isProcessingTrickEnd]);
 
     // Function to check if a card is playable based on game rules
     const isCardPlayable = useCallback((card: Card): boolean => {
@@ -176,6 +185,7 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
                 heartsBroken,
                 isClearingTrick,
                 trickAnimationTargetPlayer,
+                isProcessingTrickEnd, 
                 dealCards,
                 playCard,
                 handleComputerTurn,

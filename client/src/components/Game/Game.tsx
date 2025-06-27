@@ -34,6 +34,15 @@ const Game = () => {
     }
   }, [currentTurn, gameOver, handleComputerTurn]);
 
+  useEffect(() => {
+    console.log('Game.tsx: currentTurn updated:', currentTurn);
+  }, [currentTurn]);
+
+  useEffect(() => {
+    console.log('Game.tsx: trickPlayerIndices updated:', JSON.stringify(trickPlayerIndices));
+    console.log('Game.tsx: currentTrickCards updated:', JSON.stringify(trickCards));
+  }, [trickPlayerIndices, trickCards]);
+
   const handleCardClick = (card: CardType) => {
     console.log('Card clicked:', card);
     if (currentTurn === 0 && !gameOver) {
