@@ -1,14 +1,14 @@
 import React from "react"
-import GameStateProvider from "@/context/GameStateProvider"
+import { Provider } from 'jotai'
 import Game from "@/components/Game/Game"
 import "./App.css"
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <GameStateProvider>
+      <Provider>
         <Game />
-      </GameStateProvider>
+      </Provider>
     </div>
   )
 }

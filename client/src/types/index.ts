@@ -18,31 +18,31 @@ export interface GameState {
     heartsBroken: boolean
 }
 
-// Context types
-export interface GameStateContextType {
-    playerHands: Card[][]
-    currentTurn: number
-    gameOver: boolean
-    trickCards: Card[]
-    trickPlayerIndices: number[]
-    tricks: Card[][][]
-    scores: number[]
-    heartsBroken: boolean
-    isClearingTrick: boolean
-    trickAnimationTargetPlayer: number | null
-    isProcessingTrickEnd: boolean
-    currentRound: number
-    roundScores: number[]
-    totalScores: number[]
-    showScoreScreen: boolean
-    leadPlayer: number
-    shootingPlayer: number | null
-    gamePhase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER'
-    setGamePhase: (phase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER') => void
-    dealCards: () => void
-    playCard: (card: Card, playerIndex: number) => void
-    handleComputerTurn: () => void
-    isCardPlayable: (card: Card) => boolean
-    handleNextRound: () => void
-    handleNewGame: () => void
-}
+// // Context types
+// export interface GameStateContextType {
+//     playerHands: Card[][]
+//     currentTurn: number
+//     gameOver: boolean
+//     trickCards: Card[]
+//     trickPlayerIndices: number[]
+//     tricks: Card[][][]
+//     scores: number[]
+//     heartsBroken: boolean
+//     isClearingTrick: boolean
+//     trickAnimationTargetPlayer: number | null
+//     isProcessingTrickEnd: boolean
+//     currentRound: number
+//     roundScores: number[]
+//     totalScores: number[]
+//     showScoreScreen: boolean
+//     leadPlayer: number
+//     shootingPlayer: number | null
+//     gamePhase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER'
+//     setGamePhase: (phase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER') => void
+//     dealCards: () => void
+//     playCard: (card: Card, playerIndex: number) => void
+//     handleComputerTurn: () => void
+//     isCardPlayable: (card: Card) => boolean
+//     handleNextRound: () => void
+//     handleNewGame: () => void
+// }
