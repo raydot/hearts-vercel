@@ -11,7 +11,7 @@ export function getComputerMove(
   heartsBroken: boolean = false,
   tricks: Card[][][] = [[], [], [], []]
 ): Card | null {
-  console.log(`Computer ${playerIndex} thinking...`);
+  // console.log(`Computer ${playerIndex} thinking...`);
   const hand = playerHands[playerIndex];
 
   // Basic validation - if no cards, return null
@@ -20,7 +20,7 @@ export function getComputerMove(
     return null;
   }
 
-  console.log(`Computer ${playerIndex} has ${hand.length} cards:`, hand);
+  // console.log(`Computer ${playerIndex} has ${hand.length} cards:`, hand);
 
   // SUPER SIMPLE APPROACH - Just pick the first valid card
 
@@ -28,7 +28,7 @@ export function getComputerMove(
   if (tricks.every(playerTricks => playerTricks.length === 0) && trickCards.length === 0) {
     const twoOfClubs = hand.find((card) => card.suit === 'clubs' && card.rank === '2');
     if (twoOfClubs) {
-      console.log(`Computer ${playerIndex} playing 2 of clubs (first trick)`);
+      // console.log(`Computer ${playerIndex} playing 2 of clubs (first trick)`);
       return twoOfClubs;
     }
   }
@@ -39,7 +39,7 @@ export function getComputerMove(
     const suitCards = hand.filter((card) => card.suit === leadSuit);
 
     if (suitCards.length > 0) {
-      console.log(`Computer ${playerIndex} following suit with ${suitCards[0].suit}`);
+      // console.log(`Computer ${playerIndex} following suit with ${suitCards[0].suit}`);
       return suitCards[0];
     }
   }
@@ -48,12 +48,12 @@ export function getComputerMove(
   if (trickCards.length === 0 && !heartsBroken) {
     const nonHearts = hand.filter((card) => card.suit !== 'hearts');
     if (nonHearts.length > 0) {
-      console.log(`Computer ${playerIndex} leading with non-heart (hearts not broken)`);
+      // console.log(`Computer ${playerIndex} leading with non-heart (hearts not broken)`);
       return nonHearts[0];
     }
   }
 
-  // Last resort - play any card
-  console.log(`Computer ${playerIndex} playing any card as last resort: ${hand[0].rank} of ${hand[0].suit}`);
+  // Last resort - play first card in hand
+  // console.log(`Computer ${playerIndex} playing any card as last resort: ${hand[0].rank} of ${hand[0].suit}`);
   return hand[0];
 }

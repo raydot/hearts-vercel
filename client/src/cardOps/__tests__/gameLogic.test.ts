@@ -186,7 +186,7 @@ describe('Hearts Game Logic', () => {
                 []
             ]
 
-            expect(calculateScore(tricks)).toEqual([3, 0, 2, 0])
+            expect(calculateScore(tricks).scores).toEqual([3, 0, 2, 0])
         })
 
         it('should assign 13 points for the queen of spades in the trick', () => {
@@ -194,7 +194,7 @@ describe('Hearts Game Logic', () => {
                 // Player 0's tricks
                 [
                 ],
-                // Player 1's tricks (empty)
+                // Player 1's tricks with Queen of Spades
                 [{ suit: 'spades', rank: 'Q' }],
                 // Player 2's tricks (empty)
                 [],
@@ -202,32 +202,45 @@ describe('Hearts Game Logic', () => {
                 []
             ]
 
-            expect(calculateScore(tricks)).toEqual([0, 13, 0, 0])
+            expect(calculateScore(tricks).scores).toEqual([0, 13, 0, 0])
         })
 
-        it('should correctly calculate combined scores', () => {
+        it('should detect when a player has shot the moon and adjust scores accordingly', () => {
+            // Create tricks where player 0 has all hearts and queen of spades
             const tricks = [
-                // Player 0's tricks
+                // Player 0's tricks - all hearts and queen of spades
                 [
-                    { suit: 'hearts', rank: '2' }, 
-                    { suit: 'hearts', rank: '5' }, 
+                    { suit: 'hearts', rank: '2' },
+                    { suit: 'hearts', rank: '3' },
+                    { suit: 'hearts', rank: '4' },
+                    { suit: 'hearts', rank: '5' },
+                    { suit: 'hearts', rank: '6' },
+                    { suit: 'hearts', rank: '7' },
+                    { suit: 'hearts', rank: '8' },
+                    { suit: 'hearts', rank: '9' },
+                    { suit: 'hearts', rank: '10' },
+                    { suit: 'hearts', rank: 'J' },
+                    { suit: 'hearts', rank: 'Q' },
+                    { suit: 'hearts', rank: 'K' },
+                    { suit: 'hearts', rank: 'A' },
+                    { suit: 'spades', rank: 'Q' }
                 ],
                 // Player 1's tricks (empty)
-                [
-                    { suit: 'spades', rank: 'Q' },
-                    { suit: 'hearts', rank: '10' }
-                ],
-
-                // Player 2's tricks
-                [                ],
+                [],
+                // Player 2's tricks (empty)
+                [],
                 // Player 3's tricks (empty)
-                [
-                    { suit: 'hearts', rank: 'K' },
-                    
-                ]
+                []
             ]
-
-            expect(calculateScore(tricks)).toEqual([2, 14, 0, 1])
+            
+            // Calculate scores
+            const result = calculateScore(tricks);
+            
+            // Check that player 0 is identified as shooting the moon
+            expect(result.shootingPlayer).toBe(0);
+            
+            // Check that player 0's score is -26 (26 points subtracted)
+            expect(result.scores).toEqual([-26, 0, 0, 0]);
         })
     })
 })

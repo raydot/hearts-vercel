@@ -37,13 +37,13 @@ export const isValidMove = (
   tricks: Card[][][] = [[], [], [], []]
 ): boolean => {
   // Debug logging
-  console.log('isValidMove called with:', {
-    card,
-    playerIndex,
-    trickCards,
-    heartsBroken,
-    isFirstTrick: isFirstTrick(playerHands, tricks)
-  });
+  // console.log('isValidMove called with:', {
+  //   card,
+  //   playerIndex,
+  //   trickCards,
+  //   heartsBroken,
+  //   isFirstTrick: isFirstTrick(playerHands, tricks)
+  // });
   // Get the player's hand
   const playerHand = playerHands[playerIndex];
   
@@ -76,48 +76,48 @@ export const isValidMove = (
 };
 
 export const determineTrickWinner = (trickCards: Card[], leadPlayerIndex: number): number => {
-  console.log('[determineTrickWinner] Called with:', { 
-    trickCards: JSON.parse(JSON.stringify(trickCards)), // Deep copy for logging
-    leadPlayerIndex 
-  });
+  // console.log('[determineTrickWinner] Called with:', { 
+  //   trickCards: JSON.parse(JSON.stringify(trickCards)), // Deep copy for logging
+  //   leadPlayerIndex 
+  // });
 
   if (trickCards.length !== 4) {
-    console.log('[determineTrickWinner] Trick length not 4, returning -1. Length:', trickCards.length);
+    // console.log('[determineTrickWinner] Trick length not 4, returning -1. Length:', trickCards.length);
     return -1;
   }
 
   const leadSuit = trickCards[0].suit;
   let highestRankIndex = 0;
   let highestRankValue = getCardValue(trickCards[0].rank);
-  console.log(`[determineTrickWinner] Initial: leadSuit=${leadSuit}, highestRankIndex=0 (Card: ${trickCards[0].rank}${trickCards[0].suit}), highestRankValue=${highestRankValue}`);
+  // console.log(`[determineTrickWinner] Initial: leadSuit=${leadSuit}, highestRankIndex=0 (Card: ${trickCards[0].rank}${trickCards[0].suit}), highestRankValue=${highestRankValue}`);
 
   for (let i = 1; i < trickCards.length; i++) {
     const card = trickCards[i];
     const cardValue = getCardValue(card.rank);
-    console.log(`[determineTrickWinner] Loop i=${i}: Card=${card.rank}${card.suit}, Value=${cardValue}`);
+    // console.log(`[determineTrickWinner] Loop i=${i}: Card=${card.rank}${card.suit}, Value=${cardValue}`);
     
     if (card.suit === leadSuit && cardValue > highestRankValue) {
       highestRankIndex = i;
       highestRankValue = cardValue;
-      console.log(`[determineTrickWinner] New highest: highestRankIndex=${i} (Card: ${card.rank}${card.suit}), highestRankValue=${highestRankValue}`);
+      // console.log(`[determineTrickWinner] New highest: highestRankIndex=${i} (Card: ${card.rank}${card.suit}), highestRankValue=${highestRankValue}`);
     } else if (card.suit !== leadSuit) {
-      console.log(`[determineTrickWinner] Card ${card.rank}${card.suit} not lead suit.`);
+      // console.log(`[determineTrickWinner] Card ${card.rank}${card.suit} not lead suit.`);
     } else {
-      console.log(`[determineTrickWinner] Card ${card.rank}${card.suit} not higher value.`);
+      // console.log(`[determineTrickWinner] Card ${card.rank}${card.suit} not higher value.`);
     }
   }
 
   const winnerIndex = (leadPlayerIndex + highestRankIndex) % 4;
-  console.log(`[determineTrickWinner] Final calculation: (leadPlayerIndex=${leadPlayerIndex} + highestRankIndex=${highestRankIndex}) % 4 = ${winnerIndex}`);
-  console.log(`[determineTrickWinner] Winner index: ${winnerIndex}`);
-  console.log(`[determineTrickWinner] Trick cards: ${JSON.stringify(trickCards)}`);
-  console.log(`[determineTrickWinner] Lead player index: ${leadPlayerIndex}`);
-  console.log(`[determineTrickWinner] Highest rank index: ${highestRankIndex}`);
-  console.log(`[determineTrickWinner] Highest rank value: ${highestRankValue}`);
+  // console.log(`[determineTrickWinner] Final calculation: (leadPlayerIndex=${leadPlayerIndex} + highestRankIndex=${highestRankIndex}) % 4 = ${winnerIndex}`);
+  // console.log(`[determineTrickWinner] Winner index: ${winnerIndex}`);
+  // console.log(`[determineTrickWinner] Trick cards: ${JSON.stringify(trickCards)}`);
+  // console.log(`[determineTrickWinner] Lead player index: ${leadPlayerIndex}`);
+  // console.log(`[determineTrickWinner] Highest rank index: ${highestRankIndex}`);
+  // console.log(`[determineTrickWinner] Highest rank value: ${highestRankValue}`);
   return winnerIndex;
 };
 
-export const calculateScore = (tricks: Card[][][] | Card[][]): number[] => {
+export const calculateScore = (tricks: Card[][][] | Card[][]): { scores: number[], shootingPlayer: number | null } => {
   const scores = [0, 0, 0, 0];
 
   // Handle both data structures: Card[][][] from game engine and Card[][] from tests
@@ -151,7 +151,22 @@ export const calculateScore = (tricks: Card[][][] | Card[][]): number[] => {
     });
   });
 
-  return scores;
+  // Check if any player shot the moon (got all 26 points)
+  let shootingPlayer: number | null = null;
+  scores.forEach((score, playerIndex) => {
+    if (score === 26) {
+      shootingPlayer = playerIndex;
+    }
+  });
+
+  // If a player shot the moon, adjust their score
+  if (shootingPlayer !== null) {
+    // Subtract 26 from the shooting player's score
+    // In the future, this could be a player choice
+    scores[shootingPlayer] = -26; // Subtract 26 points
+  }
+
+  return { scores, shootingPlayer };
 };
 
 export const checkGameEnd = (playerHands: Card[][]): boolean => {

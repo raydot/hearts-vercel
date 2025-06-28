@@ -97,12 +97,13 @@ export function playCard(
 
   trickPlayerIndices: number[] = [] // Add optional parameter for trickPlayerIndices
 ): {
-  newHands: Card[][],
-  newTrickCards: Card[],
-  newTricks: Card[][][],
-  newHeartsBroken: boolean,
-  trickComplete: boolean,
-  winnerIndex: number,
+  newHands: Card[][];
+  newTrickCards: Card[];
+  newTricks: Card[][][];
+  newHeartsBroken: boolean;
+  trickComplete: boolean;
+  winnerIndex: number;
+  shootingPlayer: number | null;
   scores: number[]
 } {
   // Remove card from player's hand
@@ -116,7 +117,7 @@ export function playCard(
   
   // Update trickPlayerIndices to include this player if not provided
   const updatedTrickPlayerIndices = [...(trickPlayerIndices || []), playerIndex];
-  console.log('Updated trick player indices:', updatedTrickPlayerIndices);
+  // console.log('Updated trick player indices:', updatedTrickPlayerIndices);
   
   // Check if hearts are broken
   const newHeartsBroken = heartsBroken || card.suit === 'hearts';
@@ -137,11 +138,11 @@ export function playCard(
     // Use the trickPlayerIndices to get the actual player who played the winning card
     winnerIndex = updatedTrickPlayerIndices[highestCardIndex];
     
-    console.log('Trick complete! Winner:', winnerIndex, 'Cards:', newTrickCards);
-    console.log('Trick length check:', newTrickCards.length);
-    console.log('Highest card index in trick:', highestCardIndex);
-    console.log('Player indices:', updatedTrickPlayerIndices);
-    console.log('Winner is player:', winnerIndex);
+    // console.log('Trick complete! Winner:', winnerIndex, 'Cards:', newTrickCards);
+    // console.log('Trick length check:', newTrickCards.length);
+    // console.log('Highest card index in trick:', highestCardIndex);
+    // console.log('Player indices:', updatedTrickPlayerIndices);
+    // console.log('Winner is player:', winnerIndex);
     
     // Add trick to winner's tricks
     newTricks = [...tricks];
@@ -154,11 +155,13 @@ export function playCard(
     }
     
     // Calculate scores
-    scores = calculateScore(newTricks);
-  } else {
-    console.log('Card played:', card, 'by player', playerIndex, 'Current trick:', newTrickCards);
-    console.log('Trick length check:', newTrickCards.length);
+    const scoreResult = calculateScore(newTricks);
+    scores = scoreResult.scores;
   }
+  // } else {
+  //   console.log('Card played:', card, 'by player', playerIndex, 'Current trick:', newTrickCards);
+  //   console.log('Trick length check:', newTrickCards.length);
+  // }
   
   return {
     newHands,
@@ -167,6 +170,7 @@ export function playCard(
     newHeartsBroken,
     trickComplete,
     winnerIndex,
+    shootingPlayer: trickComplete ? calculateScore(newTricks).shootingPlayer : null,
     scores
   };
 }
@@ -209,25 +213,4 @@ export function validateMove(
   return isValidMove(card, playerIndex, playerHands, trickCards, heartsBroken, tricks);
 }
 
-/**
- * Gets the next game state
- */
-export function getNextState (
-  currentState: GameState, 
-  action: {type: 'PLAY_CARD', card: Card, playerIndex: number} | {type: 'DEAL_CARDS'}
-): GameState {
-  // Handle different action types
-  switch (action.type) {
-    case 'PLAY_CARD':
-      // In a real implementation, we would handle playing a card here
-      console.log('Playing card:', action.card, 'by player', action.playerIndex);
-      break;
-    case 'DEAL_CARDS':
-      // In a real implementation, we would handle dealing cards here
-      console.log('Dealing cards');
-      break;
-  }
-  
-  // For now, just return the current state
-  return currentState;
-}
+

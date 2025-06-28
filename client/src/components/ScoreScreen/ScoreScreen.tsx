@@ -7,6 +7,7 @@ interface ScoreScreenProps {
   totalScores: number[];
   playerNames: string[];
   currentRound: number;
+  shootingPlayer: number | null;
   onNextRound: () => void;
   onNewGame: () => void;
 }
@@ -17,6 +18,7 @@ const ScoreScreen: React.FC<ScoreScreenProps> = ({
   totalScores,
   playerNames,
   currentRound,
+  shootingPlayer,
   onNextRound,
   onNewGame
 }) => {
@@ -30,6 +32,13 @@ const ScoreScreen: React.FC<ScoreScreenProps> = ({
         
         {isGameOver && (
           <h3 className="winner-announcement">{playerNames[winnerIndex]} Wins!</h3>
+        )}
+        
+        {shootingPlayer !== null && (
+          <div className="moon-shot-alert">
+            <h3>{playerNames[shootingPlayer]} shot the moon!</h3>
+            <p>26 points have been subtracted from their score.</p>
+          </div>
         )}
         
         <div className="score-table">

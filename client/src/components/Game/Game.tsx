@@ -34,27 +34,27 @@ const Game = () => {
     }
   }, [currentTurn, gameOver, handleComputerTurn]);
 
-  useEffect(() => {
-    console.log('Game.tsx: currentTurn updated:', currentTurn);
-  }, [currentTurn]);
+  // useEffect(() => {
+  //   console.log('Game.tsx: currentTurn updated:', currentTurn);
+  // }, [currentTurn]);
 
-  useEffect(() => {
-    console.log('Game.tsx: trickPlayerIndices updated:', JSON.stringify(trickPlayerIndices));
-    console.log('Game.tsx: currentTrickCards updated:', JSON.stringify(trickCards));
-  }, [trickPlayerIndices, trickCards]);
+  // useEffect(() => {
+  //   console.log('Game.tsx: trickPlayerIndices updated:', JSON.stringify(trickPlayerIndices));
+  //   console.log('Game.tsx: currentTrickCards updated:', JSON.stringify(trickCards));
+  // }, [trickPlayerIndices, trickCards]);
 
   const handleCardClick = (card: CardType) => {
-    console.log('Card clicked:', card);
+    // console.log('Card clicked:', card);
     if (currentTurn === 0 && !gameOver) {
       // Check if the move is valid
       if (isCardPlayable(card)) {
-        console.log('Playing card:', card);
+        // console.log('Playing card:', card);
         playCard(card, 0);
       } else {
-        console.log('Invalid move!');
+        console.error('Invalid move!');
       }
     } else {
-      console.log('Not your turn or game is over');
+      console.error('Not your turn or game is over');
     }
   };
 
@@ -87,38 +87,7 @@ const Game = () => {
                 Start Game
               </button>
             </div>
-          ) : (
-            <div className="game-status">
-              <p>
-                {currentTurn === 0
-                  ? "Your turn"
-                  : `Computer ${currentTurn}'s turn`}
-              </p>
-              <div className="trick-cards">
-                {trickCards.length > 0 && (
-                  <div className="current-trick">
-                    <h3>Current Trick:</h3>
-                    <div className="trick-display">
-                      {trickCards.map((card, index) => (
-                        <div key={index} className="trick-card">
-                          {card.suit} {card.rank}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="scores-display">
-                <h3>Scores:</h3>
-                <ul>
-                  <li>You: {scores[0]}</li>
-                  <li>Computer 1: {scores[1]}</li>
-                  <li>Computer 2: {scores[2]}</li>
-                  <li>Computer 3: {scores[3]}</li>
-                </ul>
-              </div>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
       {playerHands.length > 0 && playerHands[0].length > 0 && (

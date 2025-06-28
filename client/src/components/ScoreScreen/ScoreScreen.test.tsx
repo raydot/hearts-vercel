@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ScoreScreen from './ScoreScreen';
+import { vi } from 'vitest';
+import ScoreScreen from '@/components/ScoreScreen/ScoreScreen';
 
 describe('ScoreScreen Component', () => {
   // Test data
@@ -9,7 +9,7 @@ describe('ScoreScreen Component', () => {
   const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3'];
   
   test('renders round end screen correctly', () => {
-    const handleNextRound = jest.fn();
+    const handleNextRound = vi.fn();
     
     render(
       <ScoreScreen 
@@ -18,8 +18,9 @@ describe('ScoreScreen Component', () => {
         totalScores={totalScores}
         playerNames={playerNames}
         currentRound={2}
+        shootingPlayer={null}
         onNextRound={handleNextRound}
-        onNewGame={jest.fn()}
+        onNewGame={vi.fn()}
       />
     );
     
@@ -51,7 +52,7 @@ describe('ScoreScreen Component', () => {
   });
   
   test('renders game over screen correctly', () => {
-    const handleNewGame = jest.fn();
+    const handleNewGame = vi.fn();
     
     render(
       <ScoreScreen 
@@ -60,7 +61,8 @@ describe('ScoreScreen Component', () => {
         totalScores={totalScores}
         playerNames={playerNames}
         currentRound={4}
-        onNextRound={jest.fn()}
+        shootingPlayer={null}
+        onNextRound={vi.fn()}
         onNewGame={handleNewGame}
       />
     );
@@ -90,8 +92,9 @@ describe('ScoreScreen Component', () => {
         totalScores={dangerScores}
         playerNames={playerNames}
         currentRound={4}
-        onNextRound={jest.fn()}
-        onNewGame={jest.fn()}
+        shootingPlayer={null}
+        onNextRound={vi.fn()}
+        onNewGame={vi.fn()}
       />
     );
     

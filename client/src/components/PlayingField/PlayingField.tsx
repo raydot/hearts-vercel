@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 import PlayerHand from "@/components/PlayerHand/PlayerHand"
 import Player from "@/components/Player/Player"
 import Card from "@/components/Card/Card"
+import ScoreDisplay from "@/components/ScoreDisplay/ScoreDisplay"
 import { Card as CardType } from "@/types"
 import { GameStateContext } from "@/context/GameStateProvider"
 
@@ -14,6 +15,7 @@ interface PlayingFieldProps {
   trickCards?: CardType[]
   trickPlayerIndices?: number[]
   isCardPlayable?: (card: CardType) => boolean
+  isClearingTrick?: boolean
 }
 
 const PlayingField: React.FC<PlayingFieldProps> = ({
@@ -23,9 +25,10 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
   trickCards: propsTrickCards = [],
   trickPlayerIndices: propsTrickPlayerIndices = [],
   isCardPlayable = () => true,
+  isClearingTrick: propsIsClearingTrick,
 }) => {
-  console.log('PlayingField: Received playerHands[0] (Human):', JSON.stringify(playerHands[0]));
-  console.log('PlayingField: Received playerHands[3] (Comp3):', JSON.stringify(playerHands[3]));
+  // console.log('PlayingField: Received playerHands[0] (Human):', JSON.stringify(playerHands[0]));
+  // console.log('PlayingField: Received playerHands[3] (Comp3):', JSON.stringify(playerHands[3]));
 
   const context = useContext(GameStateContext);
   if (!context) {
@@ -36,17 +39,22 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
   const {
     trickCards: contextTrickCards,
     trickPlayerIndices: contextTrickPlayerIndicesFromContext,
-    isClearingTrick,
-    trickAnimationTargetPlayer
+    isClearingTrick: contextIsClearingTrick,
+    trickAnimationTargetPlayer,
+    scores,
+    currentTurn: contextCurrentTurn
   } = context;
+  
+  // Use prop value if provided, otherwise use context value
+  const isClearingTrick = propsIsClearingTrick !== undefined ? propsIsClearingTrick : contextIsClearingTrick;
 
   const currentTrickCards = propsTrickCards.length > 0 ? propsTrickCards : contextTrickCards;
   const actualTrickPlayerIndices = propsTrickPlayerIndices.length > 0 ? propsTrickPlayerIndices : contextTrickPlayerIndicesFromContext;
 
-  console.log('PlayingField: Received propsTrickPlayerIndices:', JSON.stringify(propsTrickPlayerIndices));
-  console.log('PlayingField: Context trickPlayerIndices:', JSON.stringify(contextTrickPlayerIndicesFromContext));
-  console.log('PlayingField: actualTrickPlayerIndices being used:', JSON.stringify(actualTrickPlayerIndices));
-  console.log('PlayingField: currentTrickCards being used:', JSON.stringify(currentTrickCards));
+  // console.log('PlayingField: Received propsTrickPlayerIndices:', JSON.stringify(propsTrickPlayerIndices));
+  // console.log('PlayingField: Context trickPlayerIndices:', JSON.stringify(contextTrickPlayerIndicesFromContext));
+  // console.log('PlayingField: actualTrickPlayerIndices being used:', JSON.stringify(actualTrickPlayerIndices));
+  // console.log('PlayingField: currentTrickCards being used:', JSON.stringify(currentTrickCards));
 
   const playerHand = playerHands[0] || []
 
@@ -58,8 +66,18 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
     }
   }
 
+  // Player names for the score display
+  const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3'];
+
   return (
     <div className="playingField green-felt" data-testid="playing-field" style={{ width: '100%', minWidth: '800px' }}>
+      {/* Score Display */}
+      <ScoreDisplay 
+        scores={scores} 
+        playerNames={playerNames} 
+        currentPlayerIndex={contextCurrentTurn} 
+      />
+      
       <div className="felt-table">
         <div className={`player top ${currentTurn === 2 ? "active" : ""}`} data-testid="player-top">
           <Player name="Computer 2" isComputer={true} position="top" />

@@ -1,0 +1,53 @@
+.score-display {
+  background-color: rgba(7, 99, 36, 0.85); /* Semi-transparent green felt */
+  border: 5px solid #5c3317; /* Wood border matching the table */
+  border-radius: 10px;
+  padding: 12px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  width: 200px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.score-display h3 {
+  margin: 0 0 10px 0;
+  text-align: center;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 5px;
+}
+
+.score-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.score-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.current-player {
+  background-color: rgba(255, 215, 0, 0.2); /* Gold highlight */
+  font-weight: bold;
+}
+
+.player-name {
+  font-size: 0.9rem;
+}
+
+.player-score {
+  font-weight: bold;
+  font-size: 1rem;
+}

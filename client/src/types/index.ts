@@ -29,9 +29,18 @@ export interface GameStateContextType {
     scores: number[]
     heartsBroken: boolean
     isClearingTrick: boolean
+    trickAnimationTargetPlayer: number | null
+    isProcessingTrickEnd: boolean
+    currentRound: number
+    roundScores: number[]
+    totalScores: number[]
+    showScoreScreen: boolean
+    leadPlayer: number
+    shootingPlayer: number | null
     dealCards: () => void
     playCard: (card: Card, playerIndex: number) => void
     handleComputerTurn: () => void
     isCardPlayable: (card: Card) => boolean
+    handleNextRound: () => void
+    handleNewGame: () => void
 }
-    

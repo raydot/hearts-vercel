@@ -1,0 +1,131 @@
+.score-screen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.score-screen-card {
+  background-color: #076324; /* Green felt color matching the table */
+  border: 15px solid #5c3317; /* Wood border matching the table */
+  border-radius: 20px;
+  padding: 30px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+}
+
+.score-screen-card h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.winner-announcement {
+  font-size: 2rem;
+  color: gold;
+  margin-bottom: 30px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  animation: pulse-gold 1.5s infinite alternate;
+}
+
+@keyframes pulse-gold {
+  from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+  to { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+}
+
+.score-table {
+  width: 100%;
+  margin: 20px 0 30px;
+  border-collapse: collapse;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.score-header-row {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 15px 0;
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.score-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.score-row:last-child {
+  border-bottom: none;
+}
+
+.score-row:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.player-column {
+  flex: 2;
+  text-align: left;
+  padding-left: 20px;
+}
+
+.score-column {
+  flex: 1;
+  text-align: center;
+}
+
+.round-score {
+  color: #ff9966;
+  font-weight: bold;
+}
+
+.total-score {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.danger-score {
+  background-color: rgba(255, 50, 50, 0.3);
+}
+
+.danger-score .total-score {
+  color: #ff5555;
+}
+
+.score-screen-footer {
+  margin-top: 20px;
+}
+
+.primary-button {
+  background-color: #1a5fb4;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.primary-button:hover {
+  background-color: #1c71d8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.primary-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
