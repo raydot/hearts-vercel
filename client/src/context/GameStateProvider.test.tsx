@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import React from 'react';
-import GameStateProvider, { GameStateContext } from './GameStateProvider';
+import JotaiProvider from './JotaiProvider';
+import { GameStateContext } from './GameStateProvider';
 import { Card } from '@/types';
 import * as gameEngine from '@/engine/gameEngine';
 
@@ -46,9 +47,9 @@ describe('GameStateProvider', () => {
     };
 
     render(
-      <GameStateProvider>
+      <JotaiProvider>
         <TestComponent />
-      </GameStateProvider>
+      </JotaiProvider>
     );
 
     expect(screen.getByTestId('current-turn').textContent).toBe('0');
@@ -91,9 +92,9 @@ describe('GameStateProvider', () => {
     (gameEngine.playCard as any).mockReturnValue(mockPlayCardResult);
 
     render(
-      <GameStateProvider>
+      <JotaiProvider>
         <TestComponent />
-      </GameStateProvider>
+      </JotaiProvider>
     );
 
     // Initial turn should be South (0)

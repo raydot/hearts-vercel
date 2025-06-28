@@ -1,61 +1,39 @@
-import React, { useContext } from "react"
-import PlayerHand from "@/components/PlayerHand/PlayerHand"
-import Player from "@/components/Player/Player"
-import Card from "@/components/Card/Card"
-import ScoreDisplay from "@/components/ScoreDisplay/ScoreDisplay"
-import { Card as CardType } from "@/types"
-import { GameStateContext } from "@/context/GameStateProvider"
+import React from 'react';
+import { useAtom } from 'jotai';
+import { playerHandsAtom, trickCardsAtom, currentTurnAtom, trickPlayerIndicesAtom, isClearingTrickAtom, trickAnimationTargetPlayerAtom, roundScoresAtom } from '@/state/atoms';
+import PlayerHand from '../PlayerHand/PlayerHand';
+import Player from '../Player/Player';
+import CardComponent from '../Card/Card';
+import ScoreDisplay from '../ScoreDisplay/ScoreDisplay';
+import { Card } from '@/types';
+import { useCardActions } from '@/hooks/useCardActions';
+import './PlayingField.css';
 
-import "./PlayingField.css"
-
+// Props are optional since we can get everything from hooks
 interface PlayingFieldProps {
-  playerHands: CardType[][]
-  currentTurn: number
-  onCardClick: (card: CardType) => void
-  trickCards?: CardType[]
-  trickPlayerIndices?: number[]
-  isCardPlayable?: (card: CardType) => boolean
-  isClearingTrick?: boolean
+  onCardClick?: (card: Card) => void;
+  isCardPlayable?: (card: Card) => boolean;
 }
 
 const PlayingField: React.FC<PlayingFieldProps> = ({
-  playerHands,
-  currentTurn,
-  onCardClick,
-  trickCards: propsTrickCards = [],
-  trickPlayerIndices: propsTrickPlayerIndices = [],
-  isCardPlayable = () => true,
-  isClearingTrick: propsIsClearingTrick,
+  onCardClick: propOnCardClick,
+  isCardPlayable: propIsCardPlayable,
 }) => {
-  // console.log('PlayingField: Received playerHands[0] (Human):', JSON.stringify(playerHands[0]));
-  // console.log('PlayingField: Received playerHands[3] (Comp3):', JSON.stringify(playerHands[3]));
-
-  const context = useContext(GameStateContext);
-  if (!context) {
-    console.error("GameStateContext not found");
-    return null;
-  }
-
-  const {
-    trickCards: contextTrickCards,
-    trickPlayerIndices: contextTrickPlayerIndicesFromContext,
-    isClearingTrick: contextIsClearingTrick,
-    trickAnimationTargetPlayer,
-    scores,
-    currentTurn: contextCurrentTurn
-  } = context;
+  // Get card actions from our hook
+  const { handleCardClick, isCardPlayable: hookIsCardPlayable } = useCardActions();
   
-  // Use prop value if provided, otherwise use context value
-  const isClearingTrick = propsIsClearingTrick !== undefined ? propsIsClearingTrick : contextIsClearingTrick;
-
-  const currentTrickCards = propsTrickCards.length > 0 ? propsTrickCards : contextTrickCards;
-  const actualTrickPlayerIndices = propsTrickPlayerIndices.length > 0 ? propsTrickPlayerIndices : contextTrickPlayerIndicesFromContext;
-
-  // console.log('PlayingField: Received propsTrickPlayerIndices:', JSON.stringify(propsTrickPlayerIndices));
-  // console.log('PlayingField: Context trickPlayerIndices:', JSON.stringify(contextTrickPlayerIndicesFromContext));
-  // console.log('PlayingField: actualTrickPlayerIndices being used:', JSON.stringify(actualTrickPlayerIndices));
-  // console.log('PlayingField: currentTrickCards being used:', JSON.stringify(currentTrickCards));
-
+  // Use props if provided, otherwise use hook functions
+  const onCardClick = propOnCardClick || handleCardClick;
+  const isCardPlayable = propIsCardPlayable || hookIsCardPlayable;
+  // Use Jotai atoms instead of context
+  const [playerHands] = useAtom(playerHandsAtom);
+  const [trickCards] = useAtom(trickCardsAtom);
+  const [trickPlayerIndices] = useAtom(trickPlayerIndicesAtom);
+  const [isClearingTrick] = useAtom(isClearingTrickAtom);
+  const [trickAnimationTargetPlayer] = useAtom(trickAnimationTargetPlayerAtom);
+  const [scores] = useAtom(roundScoresAtom);
+  const [currentTurn] = useAtom(currentTurnAtom);
+  
   const playerHand = playerHands[0] || []
 
   let trickContainerClassName = "";
@@ -75,7 +53,7 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
       <ScoreDisplay 
         scores={scores} 
         playerNames={playerNames} 
-        currentPlayerIndex={contextCurrentTurn} 
+        currentPlayerIndex={currentTurn} 
       />
       
       <div className="felt-table">
@@ -101,13 +79,13 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
             </div>
           )}
           
-          {currentTrickCards && currentTrickCards.length > 0 ? (
+          {trickCards && trickCards.length > 0 ? (
             <div className={trickContainerClassName}>
-              {currentTrickCards.slice(0, 4).map((card, index) => {
+              {trickCards.slice(0, 4).map((card, index) => {
                 let positionStyle = {};
                 let position = 'bottom'; 
 
-                const playerIndex = actualTrickPlayerIndices[index];
+                const playerIndex = trickPlayerIndices[index];
 
                 if (playerIndex === 0) {
                     position = 'bottom'; 
@@ -148,7 +126,7 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
                       ...positionStyle
                     }}
                   >
-                    <Card 
+                    <CardComponent 
                       suit={card.suit} 
                       rank={card.rank} 
                     />

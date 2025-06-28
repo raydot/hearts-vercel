@@ -2,7 +2,18 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import PlayingField from './PlayingField';
 import { Card as CardType } from '@/types';
-import { GameStateContext } from '@/context/GameStateProvider';
+import { Provider } from 'jotai';
+import { playerHandsAtom, trickCardsAtom, trickPlayerIndicesAtom, isClearingTrickAtom, trickAnimationTargetPlayerAtom, roundScoresAtom, currentTurnAtom, gameOverAtom, heartsBrokenAtom, tricksAtom } from '@/state/atoms';
+import { useHydrateAtoms } from 'jotai/utils';
+import React from 'react';
+
+// Mock the useCardActions hook
+vi.mock('@/hooks/useCardActions', () => ({
+  useCardActions: () => ({
+    handleCardClick: vi.fn(),
+    isCardPlayable: () => true
+  })
+}));
 
 describe('PlayingField Component', () => {
   // Mock empty hands for basic tests
@@ -18,31 +29,54 @@ describe('PlayingField Component', () => {
   
   const mockOnCardClick = vi.fn();
   
-  // Mock GameStateContext
-  const mockGameStateContext = {
-    playerHands: emptyHands,
-    currentTurn: 0,
-    gameOver: false,
-    trickCards: [],
-    trickPlayerIndices: [],
-    tricks: [[], [], [], []],
-    scores: [0, 0, 0, 0],
-    heartsBroken: false,
-    isClearingTrick: false,
-    trickAnimationTargetPlayer: null,
-    isProcessingTrickEnd: false,
-    dealCards: vi.fn(),
-    playCard: vi.fn(),
-    handleComputerTurn: vi.fn(),
-    isCardPlayable: vi.fn().mockReturnValue(true)
+  // Jotai test initializer component
+  interface TestInitializerProps {
+    playerHands?: CardType[][];
+    currentTurn?: number;
+    trickCards?: CardType[];
+    trickPlayerIndices?: number[];
+    isClearingTrick?: boolean;
+    trickAnimationTargetPlayer?: number | null;
+    scores?: number[];
+    children: React.ReactNode;
+  }
+  
+  // Component to initialize Jotai atoms with test values
+  const TestInitializer: React.FC<TestInitializerProps> = ({ 
+    playerHands = emptyHands,
+    currentTurn = 0,
+    trickCards = [],
+    trickPlayerIndices = [],
+    isClearingTrick = false,
+    trickAnimationTargetPlayer = null,
+    scores = [0, 0, 0, 0],
+    children 
+  }) => {
+    // Initialize atoms with test values
+    useHydrateAtoms([
+      [playerHandsAtom, playerHands],
+      [currentTurnAtom, currentTurn],
+      [trickCardsAtom, trickCards],
+      [trickPlayerIndicesAtom, trickPlayerIndices],
+      [isClearingTrickAtom, isClearingTrick],
+      [trickAnimationTargetPlayerAtom, trickAnimationTargetPlayer],
+      [roundScoresAtom, scores],
+      [gameOverAtom, false],
+      [heartsBrokenAtom, false],
+      [tricksAtom, [[], [], [], []]]
+    ]);
+    
+    return <>{children}</>;
   };
   
-  // Wrap component with context provider
-  const renderWithContext = (ui: React.ReactElement, contextValue = mockGameStateContext) => {
+  // Wrap component with Jotai provider
+  const renderWithJotai = (ui: React.ReactElement, initialValues = {}) => {
     return render(
-      <GameStateContext.Provider value={contextValue}>
-        {ui}
-      </GameStateContext.Provider>
+      <Provider>
+        <TestInitializer {...initialValues}>
+          {ui}
+        </TestInitializer>
+      </Provider>
     );
   };
   
@@ -55,12 +89,8 @@ describe('PlayingField Component', () => {
   });
   
   test('renders the playing field with green felt background', () => {
-    renderWithContext(
-      <PlayingField 
-        playerHands={emptyHands} 
-        currentTurn={0} 
-        onCardClick={mockOnCardClick} 
-      />
+    renderWithJotai(
+      <PlayingField />
     );
     
     const playingField = screen.getByTestId('playing-field');
@@ -69,12 +99,8 @@ describe('PlayingField Component', () => {
   });
   
   test('positions players correctly around the table', () => {
-    renderWithContext(
-      <PlayingField 
-        playerHands={emptyHands} 
-        currentTurn={0} 
-        onCardClick={mockOnCardClick} 
-      />
+    renderWithJotai(
+      <PlayingField />
     );
     
     const topPlayer = screen.getByTestId('player-top');
@@ -96,12 +122,9 @@ describe('PlayingField Component', () => {
   });
   
   test('highlights the current player\'s turn', () => {
-    renderWithContext(
-      <PlayingField 
-        playerHands={emptyHands} 
-        currentTurn={2} // Computer 2's turn
-        onCardClick={mockOnCardClick} 
-      />
+    renderWithJotai(
+      <PlayingField />,
+      { currentTurn: 2 } // Computer 2's turn
     );
     
     const topPlayer = screen.getByTestId('player-top'); // Computer 2 (North)
@@ -117,12 +140,9 @@ describe('PlayingField Component', () => {
   
 
   test('renders the player\'s hand with actual cards', () => {
-    renderWithContext(
-      <PlayingField 
-        playerHands={populatedHands} 
-        currentTurn={0} 
-        onCardClick={mockOnCardClick} 
-      />
+    renderWithJotai(
+      <PlayingField />,
+      { playerHands: populatedHands }
     );
     
     // Check that PlayerHand component is rendered with cards
@@ -137,23 +157,15 @@ describe('PlayingField Component', () => {
   });
   
   test('renders a center play area for trick cards', () => {
-    // Create a context with trick cards
-    const contextWithTrickCards = {
-      ...mockGameStateContext,
-      trickCards: [
-        { suit: 'clubs', rank: '2' },
-        { suit: 'clubs', rank: '5' }
-      ],
-      trickPlayerIndices: [0, 1]
-    };
-    
-    renderWithContext(
-      <PlayingField 
-        playerHands={emptyHands} 
-        currentTurn={0} 
-        onCardClick={mockOnCardClick} 
-      />,
-      contextWithTrickCards
+    renderWithJotai(
+      <PlayingField />,
+      {
+        trickCards: [
+          { suit: 'clubs', rank: '2' },
+          { suit: 'clubs', rank: '5' }
+        ],
+        trickPlayerIndices: [0, 1]
+      }
     );
     
     const centerArea = screen.getByTestId('center-play-area');

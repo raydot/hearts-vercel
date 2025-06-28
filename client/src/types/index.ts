@@ -37,6 +37,8 @@ export interface GameStateContextType {
     showScoreScreen: boolean
     leadPlayer: number
     shootingPlayer: number | null
+    gamePhase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER'
+    setGamePhase: (phase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER') => void
     dealCards: () => void
     playCard: (card: Card, playerIndex: number) => void
     handleComputerTurn: () => void

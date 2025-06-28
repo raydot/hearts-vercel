@@ -1,9 +1,9 @@
 import { useAtom, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Card } from '../types';
-import { dealCards as dealCardsUtil } from '../cardOps/gameEngine';
+import { dealCards as dealCardsUtil, findStartingPlayer } from '../engine/gameEngine';
 import { isValidMove, determineTrickWinner, calculateScore } from '../cardOps/gameLogic';
-import { getComputerMove } from '../cardOps/computerPlayerLogic';
+import { getComputerMove } from '../logicOps/computerPlayerLogic';
 
 import {
   gamePhaseAtom,
@@ -23,8 +23,6 @@ import {
   totalScoresAtom,
   shootingPlayerAtom,
   showScoreScreenAtom,
-  isHandOverAtom,
-  isFinalTrickAtom,
   isLastTrickCompleteAtom
 } from './atoms';
 
@@ -40,7 +38,8 @@ export function useDealCards() {
   const setGamePhase = useSetAtom(gamePhaseAtom);
   
   return useCallback(() => {
-    const { hands, startingPlayerIndex } = dealCardsUtil();
+    const hands = dealCardsUtil();
+    const startingPlayerIndex = findStartingPlayer(hands);
     setPlayerHands(hands);
     setCurrentTurn(startingPlayerIndex);
     setLeadPlayer(startingPlayerIndex);
@@ -110,7 +109,7 @@ export function usePlayCard() {
       
       // Add the trick to the winner's tricks
       const newTricks = [...tricks];
-      newTricks[winnerIndex] = [...newTricks[winnerIndex], ...newTrickCards];
+      newTricks[winnerIndex] = [...newTricks[winnerIndex], newTrickCards];
       
       // Delay to allow the UI to show the completed trick
       setTimeout(() => {
@@ -224,7 +223,7 @@ export function useHandleComputerTurn() {
   const [tricks] = useAtom(tricksAtom);
   const [isProcessingTrickEnd] = useAtom(isProcessingTrickEndAtom);
   const [isClearingTrick] = useAtom(isClearingTrickAtom);
-  const [trickPlayerIndices] = useAtom(trickPlayerIndicesAtom);
+  // We don't need trickPlayerIndices here
   const [gamePhase] = useAtom(gamePhaseAtom);
   const [isLastTrickComplete] = useAtom(isLastTrickCompleteAtom);
   const [showScoreScreen] = useAtom(showScoreScreenAtom);

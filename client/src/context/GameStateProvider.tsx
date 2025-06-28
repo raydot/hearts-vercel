@@ -1,9 +1,11 @@
-import { createContext, useCallback, useState, ReactNode } from "react"
+import { createContext, useCallback, useEffect, ReactNode } from "react"
 import { checkGameEnd, isValidMove } from "@/cardOps/gameLogic"
 import { getComputerMove } from "@/logicOps/computerPlayerLogic"
 import { Card, GameStateContextType } from "@/types"
 import * as gameEngine from "@/engine/gameEngine"
 import ScoreScreen from "@/components/ScoreScreen/ScoreScreen"
+import { useJotaiState } from "../hooks/useJotaiState"
+import { showScoreScreenAtom, gamePhaseAtom, playerHandsAtom, currentTurnAtom, trickCardsAtom, trickPlayerIndicesAtom, tricksAtom, heartsBrokenAtom, isClearingTrickAtom, trickAnimationTargetPlayerAtom, isProcessingTrickEndAtom, leadPlayerAtom, roundScoresAtom, gameOverAtom, totalScoresAtom, shootingPlayerAtom, currentRoundAtom } from "../state/atoms"
 
 // Create the context with a default undefined value
 const GameStateContext = createContext<GameStateContextType | undefined>(undefined)
@@ -14,26 +16,33 @@ interface GameStateProviderProps {
 
 // Define the provider component
 const GameStateProvider = ({ children }: GameStateProviderProps) => {
-    const [playerHands, setPlayerHands] = useState<Card[][]>([[], [], [], []])
-    const [currentTurn, setCurrentTurn] = useState<number>(0)
-    const [gameOver, setGameOver] = useState<boolean>(false)
-    const [trickCards, setTrickCards] = useState<Card[]>([])
-    const [trickPlayerIndices, setTrickPlayerIndices] = useState<number[]>([])
-    const [isClearingTrick, setIsClearingTrick] = useState<boolean>(false)
-    const [trickAnimationTargetPlayer, setTrickAnimationTargetPlayer] = useState<number | null>(null)
-    const [tricks, setTricks] = useState<Card[][][]>([[], [], [], []])
-    const [scores, setScores] = useState<number[]>([0, 0, 0, 0])
-    const [heartsBroken, setHeartsBroken] = useState<boolean>(false)
-    const [leadPlayer, setLeadPlayer] = useState<number>(0)
-    const [isProcessingTrickEnd, setIsProcessingTrickEnd] = useState<boolean>(false);
+    // Jotai state
+    const [showScoreScreen, setShowScoreScreen] = useJotaiState(showScoreScreenAtom, false);
+    const [gamePhase, setGamePhase] = useJotaiState(gamePhaseAtom, 'DEALING');
+    
+    // React state
+    const [playerHands, setPlayerHands] = useJotaiState(playerHandsAtom, [[], [], [], []])
+    const [currentTurn, setCurrentTurn] = useJotaiState(currentTurnAtom, 0)
+    const [gameOver, setGameOver] = useJotaiState(gameOverAtom, false)
+    const [trickCards, setTrickCards] = useJotaiState(trickCardsAtom, [])
+    const [trickPlayerIndices, setTrickPlayerIndices] = useJotaiState(trickPlayerIndicesAtom, [])
+    const [tricks, setTricks] = useJotaiState(tricksAtom, [[], [], [], []])
+    const [scores, setScores] = useJotaiState(roundScoresAtom, [0, 0, 0, 0])
+    const [heartsBroken, setHeartsBroken] = useJotaiState(heartsBrokenAtom, false)
+    const [isClearingTrick, setIsClearingTrick] = useJotaiState(isClearingTrickAtom, false)
+    const [trickAnimationTargetPlayer, setTrickAnimationTargetPlayer] = useJotaiState(trickAnimationTargetPlayerAtom, null)
+    const [isProcessingTrickEnd, setIsProcessingTrickEnd] = useJotaiState(isProcessingTrickEndAtom, false);
+    const [leadPlayer, setLeadPlayer] = useJotaiState(leadPlayerAtom, 0)
     
     // New state for round management and score screen
-    const [currentRound, setCurrentRound] = useState<number>(1);
-    const [showScoreScreen, setShowScoreScreen] = useState<boolean>(false);
-    const [roundScores, setRoundScores] = useState<number[]>([0, 0, 0, 0]);
-    const [totalScores, setTotalScores] = useState<number[]>([0, 0, 0, 0]);
-    const [shootingPlayer, setShootingPlayer] = useState<number | null>(null);
+    const [currentRound, setCurrentRound] = useJotaiState(currentRoundAtom, 1);
+    const [roundScores, setRoundScores] = useJotaiState(roundScoresAtom, [0, 0, 0, 0]);
+    const [totalScores, setTotalScores] = useJotaiState(totalScoresAtom, [0, 0, 0, 0]);
+    const [shootingPlayer, setShootingPlayer] = useJotaiState(shootingPlayerAtom, null);
     const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3'];
+
+    // Game phase type
+    type GamePhase = 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER';
 
     // Deal cards function
     const dealCards = useCallback(() => {
@@ -126,6 +135,9 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
                     
                     if (handIsOver) {
                         console.log('Round is over! Round scores:', result.scores);
+                        
+                        // Update game phase to ROUND_ENDED
+                        setGamePhase('ROUND_ENDED');
                         
                         // Save round scores
                         setRoundScores(result.scores);
@@ -232,35 +244,41 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
             // If this is the final trick and all players have played, show the score screen
             // Add a longer delay to ensure the players can see the final trick completion
             console.log('Final trick complete! Showing score screen after delay...');
-            setTimeout(() => setShowScoreScreen(true), 2000);
+            
+            // IMPORTANT: Stop all game play until the user closes the score screen
+            setTimeout(() => {
+                setShowScoreScreen(true);
+                setGamePhase('SCORE_SCREEN');
+                // Don't automatically start the next round - wait for user to click "Next Round"
+            }, 2000);
             return;
         }
         
-        if (currentTurn !== 0 && !gameOver && !isClearingTrick && !isProcessingTrickEnd) { 
+        // Only proceed with computer turns if it's a computer's turn and the game is in the PLAYING phase
+        if (currentTurn !== 0 && !gameOver && !isClearingTrick && !isProcessingTrickEnd && gamePhase === 'PLAYING') {
                 // console.log(`Computer ${currentTurn}'s turn to play - hand size: ${playerHands[currentTurn].length}`)
             setTimeout(() => {
                 // Make sure we still have the right conditions when the timeout executes
-                if (currentTurn !== 0 && !gameOver && !isClearingTrick && !isProcessingTrickEnd) {
+                if (currentTurn !== 0 && !gameOver && !isClearingTrick && !isProcessingTrickEnd && gamePhase === 'PLAYING') {
                     const computerCard = getComputerMove(currentTurn, playerHands, trickCards, heartsBroken, tricks)
                     // console.log(`Computer ${currentTurn} chose:`, computerCard)
                     if (computerCard) {
                         playCard(computerCard, currentTurn)
                     } else {
-                        console.error(`Computer ${currentTurn} couldn't find any card to play - this should never happen!`)
+                        console.error(`Computer ${currentTurn} couldn't find a valid move!`)
                     }
-                } else {
-                    console.log('Conditions changed during timeout - skipping computer play')
                 }
             }, 800) // Slightly longer delay to make computer moves more visible
         }
-    }, [currentTurn, gameOver, playerHands, trickCards, heartsBroken, tricks, playCard, isClearingTrick, isProcessingTrickEnd]);
+    }, [currentTurn, gameOver, playerHands, trickCards, heartsBroken, tricks, playCard, isClearingTrick, isProcessingTrickEnd, gamePhase, showScoreScreen, trickPlayerIndices, setShowScoreScreen, setGamePhase]);
 
     // Function to check if a card is playable based on game rules
     const isCardPlayable = useCallback((card: Card): boolean => {
         if (currentTurn !== 0) return false; // Not player's turn
         if (isProcessingTrickEnd || isClearingTrick) return false; // Don't allow playing during animations
+        if (gamePhase !== 'PLAYING') return false; // Only allow playing during the PLAYING phase
         return isValidMove(card, 0, playerHands, trickCards, heartsBroken, tricks);
-    }, [currentTurn, playerHands, trickCards, heartsBroken, tricks, isProcessingTrickEnd, isClearingTrick]);
+    }, [currentTurn, playerHands, trickCards, heartsBroken, tricks, isProcessingTrickEnd, isClearingTrick, gamePhase]);
     
     // Handle next round
     const handleNextRound = useCallback(() => {
@@ -304,7 +322,9 @@ const GameStateProvider = ({ children }: GameStateProviderProps) => {
                 isCardPlayable,
                 handleNextRound,
                 handleNewGame,
-                shootingPlayer
+                shootingPlayer,
+                gamePhase,
+                setGamePhase
             }}
         >
             {children}

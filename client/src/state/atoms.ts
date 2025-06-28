@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { Card, Suit } from '../types';
+import { Card } from '../types';
 
 // Game state types
 export type GamePhase = 'DEALING' | 'PLAYING' | 'TRICK_COMPLETED' | 'ROUND_ENDED' | 'SCORE_SCREEN' | 'GAME_OVER';
