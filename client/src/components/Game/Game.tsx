@@ -71,40 +71,58 @@ const Game = () => {
   }, [gamePhase, scores, nextRound, dealCards]);
 
   return (
-    <div className="game">
+    <div className="fixed inset-0 w-full h-full flex flex-col">
       <GameStateDebug />
-      <div className="game-header">
-        <h1>Hearts</h1>
-        <div className="game-info">
+      
+      {/* Centered start/game over screens */}
+      {(gameOver || (gamePhase === 'DEALING' && (playerHands.length === 0 || playerHands[0].length === 0))) && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
           {gameOver ? (
-            <div className="game-over">
-              <h2>Game Over!</h2>
-              <div className="scores">
-                <h3>Final Scores:</h3>
-                <ul>
-                  <li>You: {scores[0]}</li>
+            <div className="bg-white p-8 rounded-lg shadow-2xl border-2 border-gray-300 max-w-md">
+              <h2 className="text-3xl font-bold mb-4 text-gray-900">Game Over!</h2>
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-3 text-gray-800">Final Scores:</h3>
+                <ul className="space-y-2 text-lg text-gray-700">
+                  <li className="font-medium">You: {scores[0]}</li>
                   <li>Computer 1: {scores[1]}</li>
                   <li>Computer 2: {scores[2]}</li>
                   <li>Computer 3: {scores[3]}</li>
                 </ul>
               </div>
-              <button onClick={dealCards} className="start-button">
+              <button 
+                onClick={dealCards} 
+                className="w-full px-8 py-4 bg-green-600 text-white text-xl font-bold rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors shadow-md"
+              >
                 Play Again
               </button>
             </div>
-          ) : gamePhase === 'DEALING' && (playerHands.length === 0 || playerHands[0].length === 0) ? (
-            <div className="start-game">
-              <h2>Welcome to Hearts!</h2>
-              <p>Click the button below to start the game.</p>
-              <button onClick={() => {
-                console.log('Game: Start Game button clicked');
-                dealCards();
-              }} className="start-button">
+          ) : (
+            <div className="bg-white p-10 rounded-xl shadow-2xl border-4 border-gray-800 max-w-md">
+              <h2 className="text-4xl font-bold mb-4" style={{ color: '#1f2937' }}>Welcome to Hearts!</h2>
+              <p className="mb-8 text-lg" style={{ color: '#4b5563' }}>Click the button below to start the game.</p>
+              <button 
+                onClick={() => {
+                  console.log('Game: Start Game button clicked');
+                  dealCards();
+                }} 
+                className="w-full px-10 py-5 rounded-xl transition-colors shadow-lg"
+                style={{ 
+                  backgroundColor: '#16a34a',
+                  color: '#ffffff',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold'
+                }}
+              >
                 Start Game
               </button>
             </div>
-          ) : null}
+          )}
         </div>
+      )}
+      
+      {/* Game title in top-left */}
+      <div className="absolute top-4 left-4 z-40">
+        <h1 className="text-3xl font-bold text-white drop-shadow-lg">Hearts</h1>
       </div>
       {(() => {
         // Show PlayingField if game is active (has cards) but NOT if showing score screen

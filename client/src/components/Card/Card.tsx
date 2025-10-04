@@ -8,13 +8,15 @@ interface CardProps {
   onClick?: () => void
   onMouseEnter?: () => void
   onMouseLeave?: () => void
+  size?: 'sm' | 'md' | 'lg'
 }
 
-const Card: React.FC<CardProps> = ({ suit, rank, onClick, onMouseEnter, onMouseLeave }) => {
+const Card: React.FC<CardProps> = ({ suit, rank, onClick, onMouseEnter, onMouseLeave, size = 'md' }) => {
   return (
     <PlayingCard
       suit={suit}
       rank={rank}
+      size={size}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

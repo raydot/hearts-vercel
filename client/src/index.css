@@ -30,6 +30,18 @@
 
   --color-card-red: #d40000;
   --color-card-black: #000000;
+  
+  /* Card state colors */
+  --color-card-playable: #00cc00;
+  --color-card-playable-ring: rgba(0, 255, 0, 0.5);
+  --color-card-selected: #3b82f6;
+  --color-card-queen-bg: #faf5ff;
+  --color-card-queen-border: #a855f7;
+  --color-card-queen-shadow: rgba(128, 0, 128, 0.5);
+  
+  /* Shadow colors */
+  --shadow-card-default: rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: rgba(0, 0, 0, 0.3);
 
   /* Card sizing */
   --spacing-card-sm: 60px;
@@ -38,10 +50,32 @@
   --spacing-card-height-sm: 90px;
   --spacing-card-height-md: 120px;
   --spacing-card-height-lg: 150px;
+  
+  /* Table layout spacing */
+  --spacing-player-edge: 30px;        /* Distance from table edge to player */
+  --spacing-table-padding: 20px;      /* Padding around table */
+  --spacing-table-border: 15px;       /* Wood border width */
+  --spacing-trick-area: 300px;        /* Center trick area size */
+  
+  /* Table dimensions */
+  --size-table-width: 95%;
+  --size-table-height: 95%;
+  --size-table-min-width: 700px;
+  --size-table-min-height: 550px;
+  --size-field-min-width: 800px;
+  --size-field-min-height: 600px;
 
   /* Border radius */
   --radius-card: 10px;
   --radius-table: 50px;
+  
+  /* Typography - Card text sizing */
+  --font-size-card-corner-sm: 10px;
+  --font-size-card-corner-md: 0.875rem;  /* text-sm */
+  --font-size-card-corner-lg: 1rem;      /* text-base */
+  --font-size-card-center-sm: 1.5rem;    /* text-2xl */
+  --font-size-card-center-md: 2.25rem;   /* text-4xl */
+  --font-size-card-center-lg: 3rem;      /* text-5xl */
 
   /* Animations */
   --animate-card-deal: card-deal 0.3s ease-out;

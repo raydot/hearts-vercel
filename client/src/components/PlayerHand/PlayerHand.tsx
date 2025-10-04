@@ -46,7 +46,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
 
   return (
     <div 
-      className="flex flex-row justify-center items-end p-5 min-h-[180px] relative [perspective:1000px]" 
+      className="flex flex-row justify-center items-end p-2 min-h-[140px] relative [perspective:1000px]" 
       data-testid="card-container"
     >
       {sortedPlayerHand.map((card, index) => {
@@ -72,6 +72,7 @@ const PlayerHand: React.FC<PlayerHandProps> = ({
             <Card
               suit={card.suit}
               rank={card.rank}
+              size="sm"
               onClick={() => handleCardClick(card)}
             />
           </div>
