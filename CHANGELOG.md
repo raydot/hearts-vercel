@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Trick completion and scoring
 - Round progression logic
 
+## v0.3.0 (2025-10-04)
+
+### Feat
+
+- complete Tailwind CSS v4 migration and UI modernization
+
 ## v0.2.0 (2025-10-04)
 
 ### Feat
