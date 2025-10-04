@@ -213,4 +213,30 @@ export function validateMove(
   return isValidMove(card, playerIndex, playerHands, trickCards, heartsBroken, tricks);
 }
 
+/**
+ * Comprehensive check if a card is playable considering game state and UI state
+ */
+export function isCardPlayable(
+  card: Card,
+  playerIndex: number,
+  playerHands: Card[][],
+  trickCards: Card[],
+  heartsBroken: boolean,
+  tricks: Card[][][],
+  currentTurn: number,
+  gameOver: boolean,
+  isProcessingTrickEnd: boolean,
+  isClearingTrick: boolean,
+  gamePhase: string
+): boolean {
+  // Basic game state checks
+  if (currentTurn !== playerIndex) return false; // Not player's turn
+  if (gameOver) return false; // Game is over
+  if (isProcessingTrickEnd || isClearingTrick) return false; // Don't allow playing during animations
+  if (gamePhase !== 'PLAYING') return false; // Only allow playing during the PLAYING phase
+  
+  // Use the core game logic validation
+  return isValidMove(card, playerIndex, playerHands, trickCards, heartsBroken, tricks);
+}
+
 

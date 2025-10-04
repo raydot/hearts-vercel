@@ -1,34 +1,21 @@
-import React from 'react';
-import { useAtom } from 'jotai';
-import {
-  playerHandsAtom,
-  currentTurnAtom,
-  gameOverAtom,
-  trickCardsAtom,
-  heartsBrokenAtom,
-  tricksAtom,
-  leadPlayerAtom,
-  roundScoresAtom,
-  totalScoresAtom,
-  currentRoundAtom,
-  gamePhaseAtom,
-  trickPlayerIndicesAtom
-} from '@/state/atoms';
+import { useGameState } from '../../hooks/useGameState';
 
 const GameStateDebug: React.FC = () => {
-  // Get all the atoms we need to debug
-  const [playerHands] = useAtom(playerHandsAtom);
-  const [currentTurn] = useAtom(currentTurnAtom);
-  const [gameOver] = useAtom(gameOverAtom);
-  const [trickCards] = useAtom(trickCardsAtom);
-  const [heartsBroken] = useAtom(heartsBrokenAtom);
-  const [tricks] = useAtom(tricksAtom);
-  const [leadPlayer] = useAtom(leadPlayerAtom);
-  const [roundScores] = useAtom(roundScoresAtom);
-  const [totalScores] = useAtom(totalScoresAtom);
-  const [currentRound] = useAtom(currentRoundAtom);
-  const [gamePhase] = useAtom(gamePhaseAtom);
-  const [trickPlayerIndices] = useAtom(trickPlayerIndicesAtom);
+  // Get state from the reducer
+  const gameState = useGameState();
+  const {
+    playerHands,
+    currentTurn,
+    gameOver,
+    trickCards,
+    heartsBroken,
+    gamePhase,
+    trickPlayerIndices,
+    scores,
+    currentRound,
+    showCompletedTrick,
+    isProcessing
+  } = gameState;
 
   const debugStyle: React.CSSProperties = {
     position: 'fixed',
@@ -84,19 +71,19 @@ const GameStateDebug: React.FC = () => {
           <strong>Current Turn:</strong> {currentTurn} {currentTurn === 0 ? '(Human)' : `(Computer ${currentTurn})`}
         </div>
         <div>
-          <strong>Lead Player:</strong> {leadPlayer}
-        </div>
-        <div>
           <strong>Game Over:</strong> {gameOver ? 'Yes' : 'No'}
         </div>
         <div>
           <strong>Hearts Broken:</strong> {heartsBroken ? 'Yes' : 'No'}
         </div>
         <div>
-          <strong>Round Scores:</strong> {JSON.stringify(roundScores)}
+          <strong>Is Processing:</strong> {isProcessing ? 'Yes' : 'No'}
         </div>
         <div>
-          <strong>Total Scores:</strong> {JSON.stringify(totalScores)}
+          <strong>Show Completed Trick:</strong> {showCompletedTrick ? 'Yes' : 'No'}
+        </div>
+        <div>
+          <strong>Scores:</strong> {JSON.stringify(scores)}
         </div>
         <div>
           <strong>Trick Cards:</strong> 
@@ -109,10 +96,6 @@ const GameStateDebug: React.FC = () => {
         <div>
           <strong>Player Hands:</strong>
           <pre>{JSON.stringify(playerHands, null, 2)}</pre>
-        </div>
-        <div>
-          <strong>Tricks History:</strong>
-          <pre>{JSON.stringify(tricks, null, 2)}</pre>
         </div>
       </div>
     </div>

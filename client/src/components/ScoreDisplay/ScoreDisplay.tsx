@@ -1,5 +1,5 @@
 import React from 'react';
-import './ScoreDisplay.css';
+import { ScorePanel } from '@/components/ui/score-panel';
 
 interface ScoreDisplayProps {
   scores: number[];
@@ -10,23 +10,14 @@ interface ScoreDisplayProps {
 const ScoreDisplay: React.FC<ScoreDisplayProps> = ({ 
   scores, 
   playerNames,
-  currentPlayerIndex 
+  currentPlayerIndex = -1
 }) => {
   return (
-    <div className="score-display">
-      <h3>Current Scores</h3>
-      <div className="score-list">
-        {scores.map((score, index) => (
-          <div 
-            key={`player-score-${index}`} 
-            className={`score-item ${currentPlayerIndex === index ? 'current-player' : ''}`}
-          >
-            <span className="player-name">{playerNames[index]}</span>
-            <span className="player-score">{score}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    <ScorePanel 
+      scores={scores}
+      playerNames={playerNames}
+      currentPlayerIndex={currentPlayerIndex}
+    />
   );
 };
 

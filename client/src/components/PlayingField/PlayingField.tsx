@@ -1,38 +1,33 @@
 import React from 'react';
-import { useAtom } from 'jotai';
-import { playerHandsAtom, trickCardsAtom, currentTurnAtom, trickPlayerIndicesAtom, isClearingTrickAtom, trickAnimationTargetPlayerAtom, roundScoresAtom } from '@/state/atoms';
 import PlayerHand from '../PlayerHand/PlayerHand';
 import Player from '../Player/Player';
 import CardComponent from '../Card/Card';
 import ScoreDisplay from '../ScoreDisplay/ScoreDisplay';
-import { Card } from '@/types';
 import { useCardActions } from '@/hooks/useCardActions';
+import { GameState } from '@/hooks/useGameReducer';
+import { Card } from '@/types';
 import './PlayingField.css';
 
-// Props are optional since we can get everything from hooks
 interface PlayingFieldProps {
-  onCardClick?: (card: Card) => void;
-  isCardPlayable?: (card: Card) => boolean;
+  gameState: GameState & { playCard: (playerIndex: number, card: Card) => void };
 }
 
-const PlayingField: React.FC<PlayingFieldProps> = ({
-  onCardClick: propOnCardClick,
-  isCardPlayable: propIsCardPlayable,
-}) => {
-  // Get card actions from our hook
-  const { handleCardClick, isCardPlayable: hookIsCardPlayable } = useCardActions();
+const PlayingField: React.FC<PlayingFieldProps> = ({ gameState }) => {
+  // Get card actions from our hook - pass the gameState
+  const { handleCardClick, isCardPlayable } = useCardActions(gameState as GameState & { playCard: (playerIndex: number, card: Card) => void });
+  // Use passed game state
+  const {
+    playerHands,
+    trickCards,
+    trickPlayerIndices,
+    scores,
+    currentTurn
+  } = gameState;
   
-  // Use props if provided, otherwise use hook functions
-  const onCardClick = propOnCardClick || handleCardClick;
-  const isCardPlayable = propIsCardPlayable || hookIsCardPlayable;
-  // Use Jotai atoms instead of context
-  const [playerHands] = useAtom(playerHandsAtom);
-  const [trickCards] = useAtom(trickCardsAtom);
-  const [trickPlayerIndices] = useAtom(trickPlayerIndicesAtom);
-  const [isClearingTrick] = useAtom(isClearingTrickAtom);
-  const [trickAnimationTargetPlayer] = useAtom(trickAnimationTargetPlayerAtom);
-  const [scores] = useAtom(roundScoresAtom);
-  const [currentTurn] = useAtom(currentTurnAtom);
+  // For now, we'll use simple state for trick clearing animation
+  // This can be moved to the reducer later if needed
+  const isClearingTrick = gameState.showCompletedTrick;
+  const trickAnimationTargetPlayer = null; // Simplified for now
   
   const playerHand = playerHands[0] || []
 
@@ -143,7 +138,7 @@ const PlayingField: React.FC<PlayingFieldProps> = ({
           <Player name="You" isComputer={false} position="bottom" />
           <PlayerHand 
             playerHand={playerHand} 
-            onCardClick={onCardClick} 
+            onCardClick={handleCardClick} 
             isCardPlayable={isCardPlayable}
           />
         </div>

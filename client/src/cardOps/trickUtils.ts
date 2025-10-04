@@ -1,5 +1,5 @@
 import { Card } from '@/types';
-import { determineTrickWinner } from './gameLogic';
+import { determineTrickWinnerWithIndices } from './gameLogic';
 
 /**
  * Calculate points from a completed trick
@@ -22,16 +22,18 @@ export const calculateTrickPoints = (completedTrickCards: Card[]): number => {
  * Determine the winner of a trick
  * @param completedTrickCards - The cards in the completed trick
  * @param leadPlayer - The player who led the trick
+ * @param playerIndices - The player indices corresponding to each card
  * @returns The index of the winning player
  */
-export const getTrickWinner = (completedTrickCards: Card[], leadPlayer: number): number => {
+export const getTrickWinner = (completedTrickCards: Card[], leadPlayer: number, playerIndices?: number[]): number => {
   // Add more debugging to help diagnose issues
   console.log('trickUtils: Getting trick winner', {
     trickCards: completedTrickCards.map(card => `${card.rank} of ${card.suit}`),
-    leadPlayer
+    leadPlayer,
+    playerIndices
   });
   
-  const winnerIndex = determineTrickWinner(completedTrickCards, leadPlayer);
+  const winnerIndex = determineTrickWinnerWithIndices(completedTrickCards, leadPlayer, playerIndices);
   console.log(`trickUtils: Determined winner is player ${winnerIndex}`);
   
   return winnerIndex;

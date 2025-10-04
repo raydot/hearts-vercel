@@ -1,11 +1,10 @@
 import React from "react"
 import { Provider } from 'jotai'
 import Game from "@/components/Game/Game"
-import "./App.css"
 
 const App: React.FC = () => {
   return (
-    <div className="App">
+    <div className="h-full w-full flex flex-col">
       <Provider>
         <Game />
       </Provider>

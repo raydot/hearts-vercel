@@ -24,6 +24,7 @@ export const heartsBrokenAtom = atom<boolean>(false);
 export const isProcessingTrickEndAtom = atom<boolean>(false);
 export const isClearingTrickAtom = atom<boolean>(false);
 export const trickAnimationTargetPlayerAtom = atom<number | null>(null);
+export const showCompletedTrickAtom = atom<boolean>(false);
 
 // Score state atoms
 export const roundScoresAtom = atom<number[]>([0, 0, 0, 0]);

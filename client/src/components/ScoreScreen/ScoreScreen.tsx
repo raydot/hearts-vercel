@@ -2,36 +2,35 @@ import React from 'react';
 import './ScoreScreen.css';
 
 interface ScoreScreenProps {
-  isGameOver: boolean;
-  roundScores: number[];
-  totalScores: number[];
-  playerNames: string[];
-  currentRound: number;
-  shootingPlayer: number | null;
+  gameState: {
+    scores: number[];
+    gameOver: boolean;
+    gamePhase: string;
+  };
   onNextRound: () => void;
   onNewGame: () => void;
 }
 
-const ScoreScreen: React.FC<ScoreScreenProps> = ({
-  isGameOver,
-  roundScores,
-  totalScores,
-  playerNames,
-  currentRound,
-  shootingPlayer,
-  onNextRound,
-  onNewGame
-}) => {
+const ScoreScreen: React.FC<ScoreScreenProps> = ({ gameState, onNextRound, onNewGame }) => {
+  const { scores, gameOver } = gameState;
+  
+  // For now, we'll use placeholder values for round scores and shooting player
+  // TODO: Track these properly in the reducer state
+  const roundScores = [0, 0, 0, 0]; // Placeholder
+  const shootingPlayer = null; // Placeholder
+  
+  // Player names are static
+  const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3'];
   // Find the winner (lowest score in Hearts)
-  const winnerIndex = totalScores.indexOf(Math.min(...totalScores));
+  const winner = scores.indexOf(Math.min(...scores));
   
   return (
     <div className="score-screen-overlay">
       <div className="score-screen-card">
-        <h2>{isGameOver ? 'Game Over!' : `Round ${currentRound} Complete`}</h2>
+        <h2>Round Complete!</h2>
         
-        {isGameOver && (
-          <h3 className="winner-announcement">{playerNames[winnerIndex]} Wins!</h3>
+        {gameOver && (
+          <h3 className="winner-announcement">{playerNames[winner]} Wins!</h3>
         )}
         
         {shootingPlayer !== null && (
@@ -51,18 +50,18 @@ const ScoreScreen: React.FC<ScoreScreenProps> = ({
           {playerNames.map((name, index) => (
             <div 
               key={`player-score-${index}`}
-              className={`score-row ${totalScores[index] >= 50 ? 'danger-score' : ''}`}
+              className={`score-row ${scores[index] >= 50 ? 'danger-score' : ''}`}
               data-testid={`player-score-row-${index}`}
             >
               <div className="player-column">{name}</div>
               <div className="score-column round-score">+{roundScores[index]}</div>
-              <div className="score-column total-score">{totalScores[index]}</div>
+              <div className="score-column total-score">{scores[index]}</div>
             </div>
           ))}
         </div>
         
         <div className="score-screen-footer">
-          {isGameOver ? (
+          {gameOver ? (
             <button 
               className="primary-button"
               onClick={onNewGame}
