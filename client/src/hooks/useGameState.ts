@@ -128,28 +128,52 @@ export function useGameState() {
   // Effect: Handle trick completion
   useEffect(() => {
     if (state.gamePhase === 'TRICK_COMPLETE') {
-      console.log('useGameState: Trick complete, processing...');
-      completeTrick();
+      console.log('useGameState: Trick complete, waiting briefly before processing...');
+      // Small delay to ensure the 4th card renders before processing
+      const timeoutId = setTimeout(() => {
+        completeTrick();
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [state.gamePhase, completeTrick]);
 
   // Effect: Handle completed trick display
   useEffect(() => {
     if (state.showCompletedTrick) {
-      console.log('useGameState: Showing completed trick for 1 second');
+      console.log('useGameState: Showing completed trick for 1.5 seconds');
       const timeoutId = setTimeout(() => {
-        // Only start new trick if round is not complete
-        if (state.gamePhase !== 'ROUND_COMPLETE' && state.trickCards.length === 4) {
+        // Check if round is over (all hands empty)
+        const isRoundOver = state.playerHands.every(hand => hand.length === 0);
+        
+        if (isRoundOver) {
+          // Round is complete - dispatch COMPLETE_ROUND
+          console.log('useGameState: Round is over, completing round');
+          safeDispatch({ type: 'COMPLETE_ROUND' });
+        } else if (state.trickCards.length === 4) {
+          // Normal trick - start new trick
           const leadPlayerIndex = state.trickPlayerIndices[0];
           const winner = determineTrickWinner(state.trickCards, leadPlayerIndex);
           const actualWinnerIndex = state.trickPlayerIndices[winner];
           startNewTrick(actualWinnerIndex);
         }
-      }, 1000);
+      }, 1500); // 1.5 seconds to view the completed trick
 
       return () => clearTimeout(timeoutId);
     }
-  }, [state.showCompletedTrick, state.trickCards, state.trickPlayerIndices, startNewTrick]);
+  }, [state.showCompletedTrick, state.trickCards, state.trickPlayerIndices, state.playerHands, startNewTrick, safeDispatch]);
+
+  // Effect: Handle round completion - show score screen after brief delay
+  useEffect(() => {
+    if (state.gamePhase === 'ROUND_COMPLETE' && !state.showScoreScreen) {
+      console.log('useGameState: Round complete, showing score screen after brief delay');
+      const timeoutId = setTimeout(() => {
+        safeDispatch({ type: 'SHOW_SCORE_SCREEN' });
+      }, 500); // Brief delay before showing score screen
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [state.gamePhase, state.showScoreScreen, safeDispatch]);
 
   // Next round action
   const nextRound = useCallback(() => {

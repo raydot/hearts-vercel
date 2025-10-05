@@ -10,6 +10,8 @@ export interface GameState {
   gamePhase: 'DEALING' | 'PLAYING' | 'TRICK_COMPLETE' | 'ROUND_COMPLETE' | 'GAME_OVER';
   heartsBroken: boolean;
   scores: number[];
+  roundScores: number[]; // Points earned this round
+  previousScores: number[]; // Scores at start of round
   gameOver: boolean;
   showCompletedTrick: boolean;
   showScoreScreen: boolean;
@@ -22,7 +24,8 @@ export type GameAction =
   | { type: 'PLAY_CARD'; payload: { playerIndex: number; card: Card } }
   | { type: 'COMPLETE_TRICK'; payload: { winner: number; points: number } }
   | { type: 'START_NEW_TRICK'; payload: { leadPlayer: number } }
-  | { type: 'COMPLETE_ROUND'; payload: { scores: number[] } }
+  | { type: 'COMPLETE_ROUND' }
+  | { type: 'SHOW_SCORE_SCREEN' }
   | { type: 'NEXT_ROUND' }
   | { type: 'NEW_GAME' }
   | { type: 'SET_PROCESSING'; payload: { isProcessing: boolean } }
@@ -37,6 +40,8 @@ export const initialGameState: GameState = {
   gamePhase: 'DEALING',
   heartsBroken: false,
   scores: [0, 0, 0, 0],
+  roundScores: [0, 0, 0, 0],
+  previousScores: [0, 0, 0, 0],
   gameOver: false,
   showCompletedTrick: false,
   showScoreScreen: false,
@@ -71,6 +76,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         gamePhase: 'PLAYING',
         heartsBroken: false,
         showCompletedTrick: false,
+        previousScores: state.scores, // Save current scores before new round
+        roundScores: [0, 0, 0, 0], // Reset round scores
         isProcessing: false,
       };
 
@@ -131,15 +138,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const newScores = [...state.scores];
       newScores[winner] += points;
       
-      // Check if round is over (all hands empty)
-      const isRoundOver = state.playerHands.every(hand => hand.length === 0);
-      
+      // Always show the completed trick first
+      // Round completion will be checked after the trick display
       return {
         ...state,
         scores: newScores,
-        gamePhase: isRoundOver ? 'ROUND_COMPLETE' : 'PLAYING',
+        gamePhase: 'PLAYING',
         showCompletedTrick: true,
-        isProcessing: false, // Allow actions again
+        isProcessing: false,
       };
     }
 
@@ -158,15 +164,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'COMPLETE_ROUND': {
-      const { scores } = action.payload;
-      const gameOver = scores.some(score => score >= 100);
+      // Calculate round scores (points earned this round)
+      const roundScores = state.scores.map((score, i) => score - state.previousScores[i]);
+      const gameOver = state.scores.some(score => score >= 100);
       
       return {
         ...state,
-        scores,
+        roundScores,
         gamePhase: 'ROUND_COMPLETE',
         gameOver,
-        showScoreScreen: true,
+        showCompletedTrick: false,
+        showScoreScreen: false, // Will be shown after a brief delay
         isProcessing: false,
       };
     }
@@ -181,6 +189,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         showCompletedTrick: action.payload.show,
+      };
+
+    case 'SHOW_SCORE_SCREEN':
+      return {
+        ...state,
+        showScoreScreen: true,
+        showCompletedTrick: false,
       };
 
     case 'NEXT_ROUND':

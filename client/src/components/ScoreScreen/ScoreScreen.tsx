@@ -1,76 +1,85 @@
-import React from 'react';
-import './ScoreScreen.css';
+import React from 'react'
 
 interface ScoreScreenProps {
   gameState: {
-    scores: number[];
-    gameOver: boolean;
-    gamePhase: string;
-  };
-  onNextRound: () => void;
-  onNewGame: () => void;
+    scores: number[]
+    roundScores: number[]
+    gameOver: boolean
+    gamePhase: string
+  }
+  onNextRound: () => void
+  onNewGame: () => void
 }
 
-const ScoreScreen: React.FC<ScoreScreenProps> = ({ gameState, onNextRound, onNewGame }) => {
-  const { scores, gameOver } = gameState;
-  
-  // For now, we'll use placeholder values for round scores and shooting player
-  // TODO: Track these properly in the reducer state
-  const roundScores = [0, 0, 0, 0]; // Placeholder
-  const shootingPlayer = null; // Placeholder
-  
+const ScoreScreen: React.FC<ScoreScreenProps> = ({
+  gameState,
+  onNextRound,
+  onNewGame
+}) => {
+  const { scores, roundScores, gameOver } = gameState
+
   // Player names are static
-  const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3'];
+  const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3']
   // Find the winner (lowest score in Hearts)
-  const winner = scores.indexOf(Math.min(...scores));
-  
+  const winner = scores.indexOf(Math.min(...scores))
+
   return (
-    <div className="score-screen-overlay">
-      <div className="score-screen-card">
-        <h2>Round Complete!</h2>
-        
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
+      <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-gray-300 max-w-2xl w-full mx-4">
+        <h2 className="text-4xl font-bold mb-6 text-center text-gray-900">
+          {gameOver ? 'Game Over!' : 'Round Complete!'}
+        </h2>
+
         {gameOver && (
-          <h3 className="winner-announcement">{playerNames[winner]} Wins!</h3>
+          <h3 className="text-2xl font-semibold mb-6 text-center text-green-600">
+            {playerNames[winner]} Wins!
+          </h3>
         )}
-        
-        {shootingPlayer !== null && (
-          <div className="moon-shot-alert">
-            <h3>{playerNames[shootingPlayer]} shot the moon!</h3>
-            <p>26 points have been subtracted from their score.</p>
+
+        {/* Score Table */}
+        <div className="mb-8">
+          {/* Header Row */}
+          <div className="grid grid-cols-3 gap-4 mb-3 pb-2 border-b-2 border-gray-300">
+            <div className="font-bold text-gray-700">Player</div>
+            <div className="font-bold text-gray-700 text-center">
+              This Round
+            </div>
+            <div className="font-bold text-gray-700 text-center">Total</div>
           </div>
-        )}
-        
-        <div className="score-table">
-          <div className="score-header-row">
-            <div className="player-column">Player</div>
-            <div className="score-column">This Round</div>
-            <div className="score-column">Total</div>
-          </div>
-          
+
+          {/* Score Rows */}
           {playerNames.map((name, index) => (
-            <div 
+            <div
               key={`player-score-${index}`}
-              className={`score-row ${scores[index] >= 50 ? 'danger-score' : ''}`}
+              className={`grid grid-cols-3 gap-4 py-3 px-2 rounded-lg ${
+                scores[index] >= 50 ? 'bg-red-50' : 'bg-gray-50'
+              }`}
               data-testid={`player-score-row-${index}`}
             >
-              <div className="player-column">{name}</div>
-              <div className="score-column round-score">+{roundScores[index]}</div>
-              <div className="score-column total-score">{scores[index]}</div>
+              <div className="font-medium text-gray-900">{name}</div>
+              <div className="text-center text-red-600 font-semibold">
+                +{roundScores[index]}
+              </div>
+              <div className="text-center text-gray-900 font-bold text-lg">
+                {scores[index]}
+              </div>
             </div>
           ))}
         </div>
-        
-        <div className="score-screen-footer">
+
+        {/* Action Button */}
+        <div className="flex justify-center">
           {gameOver ? (
-            <button 
-              className="primary-button"
+            <button
+              className="px-10 py-4 bg-green-600 text-white text-xl font-bold rounded-xl hover:bg-green-700 active:bg-green-800 transition-colors shadow-lg"
               onClick={onNewGame}
             >
               New Game
             </button>
           ) : (
-            <button 
-              className="primary-button"
+            <button
+              className="px-10 py-4 bg-blue-600 text-white text-xl font-bold rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-lg"
+              style={{ backgroundColor: 'rgb(22, 163, 74)' }}
               onClick={onNextRound}
             >
               Next Round
@@ -79,7 +88,7 @@ const ScoreScreen: React.FC<ScoreScreenProps> = ({ gameState, onNextRound, onNew
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ScoreScreen;
+export default ScoreScreen
