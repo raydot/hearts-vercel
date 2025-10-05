@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Trick completion and scoring
 - Round progression logic
 
+## v0.3.1 (2025-10-05)
+
+### Fix
+
+- implement proper round completion flow with score screen
+
 ## v0.3.0 (2025-10-04)
 
 ### Feat
