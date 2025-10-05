@@ -12,6 +12,7 @@ export interface GameState {
   scores: number[];
   roundScores: number[]; // Points earned this round
   previousScores: number[]; // Scores at start of round
+  roundNumber: number; // Current round number (1-based)
   gameOver: boolean;
   showCompletedTrick: boolean;
   showScoreScreen: boolean;
@@ -42,6 +43,7 @@ export const initialGameState: GameState = {
   scores: [0, 0, 0, 0],
   roundScores: [0, 0, 0, 0],
   previousScores: [0, 0, 0, 0],
+  roundNumber: 1,
   gameOver: false,
   showCompletedTrick: false,
   showScoreScreen: false,
@@ -134,15 +136,20 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'COMPLETE_TRICK': {
       const { winner, points } = action.payload;
       
-      // Update scores
+      // Update cumulative scores
       const newScores = [...state.scores];
       newScores[winner] += points;
+      
+      // Update round scores (points earned this round)
+      const newRoundScores = [...state.roundScores];
+      newRoundScores[winner] += points;
       
       // Always show the completed trick first
       // Round completion will be checked after the trick display
       return {
         ...state,
         scores: newScores,
+        roundScores: newRoundScores,
         gamePhase: 'PLAYING',
         showCompletedTrick: true,
         isProcessing: false,
@@ -209,6 +216,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         heartsBroken: false,
         showCompletedTrick: false,
         showScoreScreen: false,
+        roundNumber: state.roundNumber + 1,
         isProcessing: false,
       };
 

@@ -4,6 +4,7 @@ interface ScoreScreenProps {
   gameState: {
     scores: number[]
     roundScores: number[]
+    roundNumber: number
     gameOver: boolean
     gamePhase: string
   }
@@ -16,7 +17,7 @@ const ScoreScreen: React.FC<ScoreScreenProps> = ({
   onNextRound,
   onNewGame
 }) => {
-  const { scores, roundScores, gameOver } = gameState
+  const { scores, roundScores, roundNumber, gameOver } = gameState
 
   // Player names are static
   const playerNames = ['You', 'Computer 1', 'Computer 2', 'Computer 3']
@@ -26,8 +27,8 @@ const ScoreScreen: React.FC<ScoreScreenProps> = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
       <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-gray-300 max-w-2xl w-full mx-4">
-        <h2 className="text-4xl font-bold mb-6 text-center text-gray-900">
-          {gameOver ? 'Game Over!' : 'Round Complete!'}
+        <h2 className="text-4xl font-bold mb-2 text-center text-gray-900">
+          {gameOver ? 'Game Over!' : `Round ${roundNumber} Complete!`}
         </h2>
 
         {gameOver && (

@@ -20,7 +20,7 @@ const PlayingField: React.FC<PlayingFieldProps> = ({ gameState }) => {
     }
   )
   // Use passed game state
-  const { playerHands, trickCards, trickPlayerIndices, scores, currentTurn } =
+  const { playerHands, trickCards, trickPlayerIndices, roundScores, currentTurn } =
     gameState
 
   // For now, we'll use simple state for trick clearing animation
@@ -48,7 +48,7 @@ const PlayingField: React.FC<PlayingFieldProps> = ({ gameState }) => {
     >
       {/* Score Display */}
       <ScoreDisplay
-        scores={scores}
+        scores={roundScores}
         playerNames={playerNames}
         currentPlayerIndex={currentTurn}
       />
