@@ -95,3 +95,20 @@ This project is licensed under the Unlicense - see the LICENSE file in the clien
 
 - Card design inspired by traditional playing cards
 - Game logic based on the classic Hearts card game rules
+
+## The Problem Space
+
+Hearts is a useful laboratory for exploring reasoning under uncertainty. Unlike perfect information games, you can only see your own cards and must infer opponent strategies from observed play. This creates interesting challenges:
+
+- Incomplete information: 39 of 52 cards are hidden at game start
+- Adversarial reasoning: Opponents actively try to deceive or exploit you
+- Intermediate-term planning: Decisions affect outcomes several tricks ahead
+- Measurable outcomes: Clear success metrics for evaluating different approaches
+
+The goal isn't just to build a better card game AI, but to explore how AI agents can:
+
+- Track what they know vs. don't know explicitly
+- Identify what information would reduce uncertainty
+- Make decisions that account for different failure modes
+
+If the reasoning approach works for Hearts, it may transfer to other domains where similar challenges exist.
